@@ -3,6 +3,7 @@ class ScoreBoard:
     def __init__(self):
         self.score = 0
         self.level = 1
+        self.lines = 0
         self.action = None
 
     #state - soft, hard drop
@@ -20,6 +21,6 @@ class ScoreBoard:
             self.score += 500 * self.level 
         elif action == "Tetris":
             self.score += 800 * self.level 
-        
+
         
 

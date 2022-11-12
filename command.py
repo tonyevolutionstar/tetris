@@ -44,7 +44,7 @@ class InputHandler:
     }
 
     """
-    state = "normal", "hard", "soft", "hold" 
+    state = "hard", "soft", "hold" 
     first three are drops, the last is hold the piece
     """    
     def handleInput(self, event, image_ori, state):
