@@ -4,6 +4,7 @@ from pieces import *
 from pygame.sprite import *
 from pygame.font import *
 from pygame import *
+from command import InputHandler
 
 pygame.init() # starts up pyGame
 
@@ -25,15 +26,19 @@ back_sprite.add(background)
 
 
 def main():
+    image_ori = (0, -1)
+    state = "normal"
     running = 1
-    
     #pygame.display.flip()
     while running:
-        e = event.wait() #pause until event occurs
-        if e.type == QUIT:
-            pygame.quit() #shuts down pyGame
-            running = 0
-            break
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit() #shuts down pyGame
+                running = 0
+            elif event.type == pygame.KEYDOWN:
+                i = InputHandler()
+                image_ori, state = i.handleInput(event, image_ori, state)
+                #print(str(image_ori) + ":" + str(state))
 
         screen.fill((255, 255, 255))
         back_sprite.draw(screen)

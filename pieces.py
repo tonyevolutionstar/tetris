@@ -9,14 +9,14 @@ class Piece(pygame.sprite.Sprite):
         self.path = os.getcwd() + "\\sprite_sheet\\"
         pieces_choosed = self.choice_pieces()
         self.image = pygame.image.load(pieces_choosed).convert()
-        self.image = pygame.transform.scale(self.image, (20, 44)) 
-        self.rect = Rect(50, 100, 300, 200)
+        self.image = pygame.transform.scale(self.image, (34, 75)) 
+        self.rect = Rect(140, 60, 300, 100)
 
     def next_piece(self):
         self.path = os.getcwd() + "\\sprite_sheet\\"
         pieces_choosed = self.choice_pieces()
         self.image = pygame.image.load(pieces_choosed).convert()
-        self.image = pygame.transform.scale(self.image, (34, 75)) 
+        self.image = pygame.transform.scale(self.image, (20, 44)) 
         self.rect = Rect(320, 120, 20, 50)
         
 
