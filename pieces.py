@@ -1,32 +1,57 @@
-import os
 import pygame
 import random 
+import math
 from pygame.sprite import *
 
 class Piece(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, display, scale, width, height):
         pygame.sprite.Sprite.__init__(self)
-        self.path = os.getcwd() + "\\sprite_sheet\\"
-        pieces_choosed = self.choice_pieces()
-        self.image = pygame.image.load(pieces_choosed).convert()
-        self.image = pygame.transform.scale(self.image, (34, 75)) 
-        self.rect = Rect(140, 60, 300, 100)
+        self.display = display
+        self.scale = scale 
 
-    def next_piece(self):
-        self.path = os.getcwd() + "\\sprite_sheet\\"
-        pieces_choosed = self.choice_pieces()
-        self.image = pygame.image.load(pieces_choosed).convert()
-        self.image = pygame.transform.scale(self.image, (20, 44)) 
-        self.rect = Rect(320, 120, 20, 50)
-        
+        x =  math.floor(width / 2)
+
+        self.pieces_dict = {}
+        self.pieces_dict["piece_1"] = [(x,1), (x,2), (x,3), (x,4)]
+        self.pieces_dict["piece_l"] = [(x,1), (x,2), (x,3), (x+1,3)]
+        self.pieces_dict["piece_r"] = [(x,1), (x+1,1), (x,2), (x+1,2)]
+        self.pieces_dict["piece_s"] = [(x-1, 2), (x, 2), (x,1), (x+1, 1)]
+        self.pieces_dict["piece_t"] = [(x-1, 2), (x, 2), (x+1, 2), (x,1)]
+        self.actual_piece = self.choice_pieces()
+        self.color = self.set_color_piece()
+
 
     def choice_pieces(self):
-        pieces_list = ['1.png', 'L.png', 'R.png', 'S.png', 'T.png']
-        return self.path + random.choice(pieces_list)
+        pieces_choosed = ""
+        random_piece = random.choice(list(self.pieces_dict.values()))
+        
+        for piece in self.pieces_dict:
+            if self.pieces_dict[piece] == random_piece:
+                pieces_choosed = piece
 
-class Background(pygame.sprite.Sprite):
-    def __init__(self, SCALE, WIDTH, HEIGHT):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.getcwd() + "\\sprite_sheet\\"+'background.jpg').convert()
-        self.image = pygame.transform.scale(self.image, (SCALE * WIDTH, SCALE * HEIGHT)) 
-        self.rect = Rect(0, 0, SCALE * WIDTH, SCALE * HEIGHT)
+        return pieces_choosed
+
+
+    def set_color_piece(self):
+        if self.actual_piece == "piece_1":
+            self.color = "orange"
+        elif self.actual_piece == "piece_l":
+            self.color = "yellow"
+        elif self.actual_piece == "piece_r":
+            self.color = "brown"
+        elif self.actual_piece == "piece_s":
+            self.color = "red"
+        elif self.actual_piece == "piece_t":
+            self.color = "green"
+        return self.color
+
+
+    def fill_piece(self):
+        
+        for piece in self.pieces_dict:
+            if piece == self.actual_piece:
+                for x,y in self.pieces_dict[piece]:
+                    pygame.draw.rect(self.display, self.color, (self.scale * x, self.scale * y, self.scale, self.scale))
+
+
+

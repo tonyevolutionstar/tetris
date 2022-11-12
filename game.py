@@ -19,18 +19,19 @@ back_sprite = pygame.sprite.GroupSingle()
 name = Font(None, 16)
 
 pygame.display.set_caption("Tetris")
-pieces = Piece()
-background = Background(SCALE, WIDTH, HEIGHT)
-piece_sprite.add(pieces)
-back_sprite.add(background)
+
 
 
 def main():
+    pieces = Piece(screen, SCALE, WIDTH, HEIGHT)
+    
+    piece_sprite.add(pieces)
     image_ori = (0, -1)
     state = "normal"
     running = 1
     #pygame.display.flip()
     while running:
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit() #shuts down pyGame
@@ -38,12 +39,11 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 i = InputHandler()
                 image_ori, state = i.handleInput(event, image_ori, state)
-                #print(str(image_ori) + ":" + str(state))
 
         screen.fill((255, 255, 255))
-        back_sprite.draw(screen)
-        back_sprite.update()
-        piece_sprite.draw(screen)
+        pieces.fill_piece()
+        
+        #piece_sprite.draw(screen)
         piece_sprite.update()
        
         pygame.display.update()
