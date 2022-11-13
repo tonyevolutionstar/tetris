@@ -42,14 +42,11 @@ def labels(score, WIDTH):
 
 def main():
     pieces = Piece(screen, SCALE, WIDTH - 10, HEIGHT)
-    game_w = Game_window(screen, 30, 50, SCALE)
     piece_sprite.add(pieces)
-    game_sprite.add(game_w)
     score = ScoreBoard()
     image_ori = (0, -1)
     state = "soft"
     running = 1
-    #pygame.display.flip()
     while running:
 
         for event in pygame.event.get():
@@ -68,8 +65,7 @@ def main():
         screen_play = pygame.Rect(70,0, 30 * SCALE, 58 * SCALE)
         pygame.draw.rect(screen, (0,0,0), screen_play, 2)
 
-        #game_sprite.draw(game_w)
-        #game_sprite.update()
+    
         #pygame.display.update()
         pygame.display.flip()
         #pygame.quit()
