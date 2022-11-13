@@ -15,10 +15,9 @@ SCALE = 10
 screen = pygame.display.set_mode((SCALE * WIDTH, SCALE * HEIGHT))
 clock = pygame.time.Clock()
 clock.tick(24)
-piece_sprite = pygame.sprite.GroupSingle()
-
+piece_sprite = pygame.sprite.Group()
+game_sprite = pygame.sprite.GroupSingle()
 score_label = Font(None, 20)
-
 
 pygame.display.set_caption("Tetris")
 
@@ -43,7 +42,9 @@ def labels(score, WIDTH):
 
 def main():
     pieces = Piece(screen, SCALE, WIDTH - 10, HEIGHT)
+    game_w = Game_window(screen, 30, 50, SCALE)
     piece_sprite.add(pieces)
+    game_sprite.add(game_w)
     score = ScoreBoard()
     image_ori = (0, -1)
     state = "soft"
@@ -64,8 +65,13 @@ def main():
         labels(score, WIDTH)
 
         piece_sprite.update()
-       
-        pygame.display.update()
+        screen_play = pygame.Rect(70,0, 30 * SCALE, 58 * SCALE)
+        pygame.draw.rect(screen, (0,0,0), screen_play, 2)
+
+        #game_sprite.draw(game_w)
+        #game_sprite.update()
+        #pygame.display.update()
+        pygame.display.flip()
         #pygame.quit()
     
 

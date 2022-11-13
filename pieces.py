@@ -1,3 +1,4 @@
+from msilib.schema import Class
 import pygame
 import random 
 import math
@@ -47,11 +48,15 @@ class Piece(pygame.sprite.Sprite):
 
 
     def fill_piece(self):
-        
         for piece in self.pieces_dict:
             if piece == self.actual_piece:
                 for x,y in self.pieces_dict[piece]:
                     pygame.draw.rect(self.display, self.color, (self.scale * x, self.scale * y, self.scale, self.scale))
 
 
+class Game_window(pygame.sprite.Sprite):
+    def __init__(self, display, x, y, scale):
+        
+        pygame.sprite.Sprite.__init__(self)
+        pygame.draw.rect(display, (0,0,0), (x * scale, y * scale, scale, scale), 2)
 
