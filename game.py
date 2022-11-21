@@ -6,6 +6,7 @@ from pygame.font import *
 from pygame import *
 from command import InputHandler
 from scoreboard import ScoreBoard
+from screen_play import Screen_play
 
 pygame.init() # starts up pyGame
 
@@ -16,7 +17,7 @@ screen = pygame.display.set_mode((SCALE * WIDTH, SCALE * HEIGHT))
 clock = pygame.time.Clock()
 clock.tick(24)
 piece_sprite = pygame.sprite.Group()
-game_sprite = pygame.sprite.GroupSingle()
+screen_sprite = pygame.sprite.Group()
 score_label = Font(None, 20)
 
 pygame.display.set_caption("Tetris")
@@ -40,32 +41,54 @@ def labels(score, WIDTH):
     pygame.Surface.blit(screen, next_piece_label, (WIDTH * SCALE - 100, 200))
 
 
+def check_wall(piece_choosed, x, y):
+    wall = 0
+    if piece_choosed == "piece_1":
+        if 8 <= x <= 35 and 0 <= y <= 59:
+            wall = 0
+        else:
+            wall = 1
+    else:
+        if 8 <= x <= 34 and 0 <= y <= 59:
+            wall = 0
+        else:
+            wall = 1
+    return wall 
+    
+
 def main():
     pieces = Piece(screen, SCALE, WIDTH - 10, HEIGHT)
     piece_sprite.add(pieces)
+    screen_play = Screen_play(screen, 70, 5, 30, 60, SCALE)
+    piece_sprite.add(screen_play)
     score = ScoreBoard()
     image_ori = (0, -1)
     state = "soft"
     running = 1
     while running:
-
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit() #shuts down pyGame
                 running = 0
             elif event.type == pygame.KEYDOWN:
+                min_tuple = min(pieces.pieces_dict[pieces.actual_piece], key=lambda tup: tup[1])
+                wall = check_wall(pieces.actual_piece, min_tuple[0], min_tuple[1])
+                
                 i = InputHandler()
-                image_ori, state = i.handleInput(event, image_ori, state)
-
+                image_ori, state = i.handleInput(event, image_ori, state, wall)
+                print(wall)
+                pieces.change_dir(image_ori)
+                
         screen.fill((255, 255, 255))
+
         pieces.fill_piece()
+        screen_play.draw_screen()
+
         labels(score, WIDTH)
-
+        
         piece_sprite.update()
-        screen_play = pygame.Rect(70,0, 30 * SCALE, 58 * SCALE)
-        pygame.draw.rect(screen, (0,0,0), screen_play, 2)
-
-    
+        screen_sprite.update()
+     
         #pygame.display.update()
         pygame.display.flip()
         #pygame.quit()

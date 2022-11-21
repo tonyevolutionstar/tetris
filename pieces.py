@@ -1,4 +1,5 @@
 from msilib.schema import Class
+from tkinter import N
 import pygame
 import random 
 import math
@@ -9,17 +10,23 @@ class Piece(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.display = display
         self.scale = scale 
-
-        x =  math.floor(width / 2)
+        self.x =  math.floor(width / 2)
+        self.length = 4
 
         self.pieces_dict = {}
-        self.pieces_dict["piece_1"] = [(x,1), (x,2), (x,3), (x,4)]
-        self.pieces_dict["piece_l"] = [(x,1), (x,2), (x,3), (x+1,3)]
-        self.pieces_dict["piece_r"] = [(x,1), (x+1,1), (x,2), (x+1,2)]
-        self.pieces_dict["piece_s"] = [(x-1, 2), (x, 2), (x,1), (x+1, 1)]
-        self.pieces_dict["piece_t"] = [(x-1, 2), (x, 2), (x+1, 2), (x,1)]
-        self.actual_piece = self.choice_pieces()
+        self.create_pieces()
+        #self.actual_piece = self.choice_pieces()
+        self.actual_piece = "piece_1"
         self.color = self.set_color_piece()
+      
+
+
+    def create_pieces(self):
+        self.pieces_dict["piece_1"] = [(self.x,1), (self.x,2), (self.x,3), (self.x,4)]
+        self.pieces_dict["piece_l"] = [(self.x,1), (self.x,2), (self.x,3), (self.x+1,3)]
+        self.pieces_dict["piece_r"] = [(self.x,1), (self.x+1,1), (self.x,2), (self.x+1,2)]
+        self.pieces_dict["piece_s"] = [(self.x-1, 2), (self.x, 2), (self.x,1), (self.x+1, 1)]
+        self.pieces_dict["piece_t"] = [(self.x-1, 2), (self.x, 2), (self.x+1, 2), (self.x,1)]
 
 
     def choice_pieces(self):
@@ -48,7 +55,16 @@ class Piece(pygame.sprite.Sprite):
 
 
     def fill_piece(self):
-        for piece in self.pieces_dict:
-            if piece == self.actual_piece:
-                for x,y in self.pieces_dict[piece]:
-                    pygame.draw.rect(self.display, self.color, (self.scale * x, self.scale * y, self.scale, self.scale))
+        for x,y in self.pieces_dict[self.actual_piece]:
+            self.rect = pygame.Rect(self.scale * x, self.scale * y, self.scale, self.scale)
+            pygame.draw.rect(self.display, self.color, (self.scale * x, self.scale * y, self.scale, self.scale))
+                   
+
+    def change_dir(self, vector):
+        new_list = []
+        x, y = vector
+    
+        for x_p, y_p in self.pieces_dict[self.actual_piece]:
+            new_list.append((x_p + x, y_p + y))
+        self.pieces_dict[self.actual_piece] = new_list
+

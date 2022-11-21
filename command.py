@@ -47,21 +47,32 @@ class InputHandler:
     state = "hard", "soft", "hold" 
     first three are drops, the last is hold the piece
     """    
-    def handleInput(self, event, image_ori, state):
-        print(event.key)
-        if event.key == pygame.K_z:
-            image_ori = (0, -1)
-        elif event.key == pygame.K_UP:
-            image_ori = (0, 1)
-        elif event.key == pygame.K_LEFT:
+    def handleInput(self, event, image_ori, state, wall):
+        
+        if event.key == pygame.K_LEFT and wall == 1:
+            image_ori = (1, 0)
+        elif  event.key == pygame.K_RIGHT and wall == 1:
             image_ori = (-1, 0)
-        elif event.key == pygame.K_RIGHT:
+        elif event.key == pygame.K_DOWN and wall == 1:
+            image_ori = (0, -1)
+
+
+        if event.key == pygame.K_z:
+            pass # rotate left
+        elif event.key == pygame.K_UP:
+            pass # rotate right
+        elif event.key == pygame.K_LEFT and wall == 0:
+            image_ori = (-1, 0)
+        elif event.key == pygame.K_RIGHT and wall == 0:
             image_ori = (1, 0)
         elif event.key == pygame.K_c:
             state = "hold"
-        elif event.key == pygame.K_DOWN:
+        elif event.key == pygame.K_DOWN and wall == 0:
             state = "soft"
-        elif event.key == pygame.K_SPACE:
+            image_ori = (0, 1)
+        elif event.key == pygame.K_SPACE and wall == 0:
             state = "hard"
-        
+            image_ori = (0, 1)
+      
+
         return image_ori, state
