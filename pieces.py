@@ -10,15 +10,13 @@ class Piece(pygame.sprite.Sprite):
         self.scale = scale 
         self.x =  math.floor(width / 2)
         self.length = 4
-
         self.pieces_dict = {}
         self.create_pieces()
-        #self.actual_piece = self.choice_pieces()
-        #self.actual_piece = "piece_j"
+        self.actual_piece = self.choice_pieces()
+        #self.actual_piece = "piece_z"
         self.rect = self.pieces_dict[self.actual_piece]
         self.color = self.set_color_piece()
         
-
 
     def create_pieces(self):
         self.pieces_dict = {
