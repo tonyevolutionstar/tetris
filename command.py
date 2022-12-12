@@ -18,6 +18,7 @@ class InputHandler:
             image_ori = (1, 0)
         elif event.key == pygame.K_c:
             state = "hold"
+            image_ori = (0, 0)
         elif event.key == pygame.K_DOWN:
             state = "soft"
             image_ori = (0, 1)
