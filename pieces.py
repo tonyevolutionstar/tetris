@@ -1,5 +1,3 @@
-from msilib.schema import Class
-from tkinter import N
 import pygame
 import random 
 import math
@@ -16,17 +14,22 @@ class Piece(pygame.sprite.Sprite):
         self.pieces_dict = {}
         self.create_pieces()
         #self.actual_piece = self.choice_pieces()
-        self.actual_piece = "piece_1"
+        #self.actual_piece = "piece_j"
+        self.rect = self.pieces_dict[self.actual_piece]
         self.color = self.set_color_piece()
-      
+        
 
 
     def create_pieces(self):
-        self.pieces_dict["piece_1"] = [(self.x,1), (self.x,2), (self.x,3), (self.x,4)]
-        self.pieces_dict["piece_l"] = [(self.x,1), (self.x,2), (self.x,3), (self.x+1,3)]
-        self.pieces_dict["piece_r"] = [(self.x,1), (self.x+1,1), (self.x,2), (self.x+1,2)]
-        self.pieces_dict["piece_s"] = [(self.x-1, 2), (self.x, 2), (self.x,1), (self.x+1, 1)]
-        self.pieces_dict["piece_t"] = [(self.x-1, 2), (self.x, 2), (self.x+1, 2), (self.x,1)]
+        self.pieces_dict = {
+            "piece_1": [(self.x,1), (self.x,2), (self.x,3), (self.x,4)],
+            "piece_l": [(self.x,1), (self.x,2), (self.x,3), (self.x+1,3)],
+            "piece_j": [(self.x,1), (self.x,2), (self.x,3), (self.x-1,3)],    
+            "piece_r": [(self.x,1), (self.x+1,1), (self.x,2), (self.x+1,2)],
+            "piece_s": [(self.x-1, 2), (self.x, 2), (self.x,1), (self.x+1, 1)],
+            "piece_t": [(self.x-1, 2), (self.x, 2), (self.x+1, 2), (self.x,1)],
+            "piece_z": [(self.x+1, 2), (self.x, 2), (self.x,1), (self.x-1, 1)]
+        }
 
 
     def choice_pieces(self):
@@ -41,16 +44,11 @@ class Piece(pygame.sprite.Sprite):
 
 
     def set_color_piece(self):
-        if self.actual_piece == "piece_1":
-            self.color = "orange"
-        elif self.actual_piece == "piece_l":
-            self.color = "yellow"
-        elif self.actual_piece == "piece_r":
-            self.color = "brown"
-        elif self.actual_piece == "piece_s":
-            self.color = "red"
-        elif self.actual_piece == "piece_t":
-            self.color = "green"
+        colors = { "piece_1": "orange", "piece_l": "yellow", "piece_j":"purple", "piece_r": "brown", 
+                "piece_s": "red", "piece_z": "blue", "piece_t": "green"}
+
+        self.color = colors[self.actual_piece]
+
         return self.color
 
 
@@ -65,6 +63,7 @@ class Piece(pygame.sprite.Sprite):
         x, y = vector
     
         for x_p, y_p in self.pieces_dict[self.actual_piece]:
+            
             new_list.append((x_p + x, y_p + y))
         self.pieces_dict[self.actual_piece] = new_list
 

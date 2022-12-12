@@ -41,18 +41,10 @@ def labels(score, WIDTH):
     pygame.Surface.blit(screen, next_piece_label, (WIDTH * SCALE - 100, 200))
 
 
-def check_wall(piece_choosed, x, y):
+def check_wall(piece_choosed, p):
+
     wall = 0
-    if piece_choosed == "piece_1":
-        if 8 <= x <= 35 and 0 <= y <= 59:
-            wall = 0
-        else:
-            wall = 1
-    else:
-        if 8 <= x <= 34 and 0 <= y <= 59:
-            wall = 0
-        else:
-            wall = 1
+
     return wall 
     
 
@@ -65,33 +57,38 @@ def main():
     image_ori = (0, -1)
     state = "soft"
     running = 1
+    wall_l = pygame.Rect(80, 0, 10, 580)
+    wall_r = pygame.Rect(360, 0, 10, 580)
+    wall_b = pygame.Rect(0, 580, 0, 0)
+    collide_l = False
+    collide_r = False
+
     while running:
         for event in pygame.event.get():
+             
             if event.type == QUIT:
                 pygame.quit() #shuts down pyGame
                 running = 0
             elif event.type == pygame.KEYDOWN:
-                min_tuple = min(pieces.pieces_dict[pieces.actual_piece], key=lambda tup: tup[1])
-                wall = check_wall(pieces.actual_piece, min_tuple[0], min_tuple[1])
-                
-                i = InputHandler()
-                image_ori, state = i.handleInput(event, image_ori, state, wall)
-                print(wall)
-                pieces.change_dir(image_ori)
-                
-        screen.fill((255, 255, 255))
 
+                print(pieces.pieces_dict[pieces.actual_piece])
+                i = InputHandler(pieces.pieces_dict[pieces.actual_piece], 8, 35, 58)
+                image_ori, state = i.handleInput(event, image_ori, state)
+                #pieces.change_dir(image_ori)
+             
+      
+        screen.fill((255, 255, 255))
         pieces.fill_piece()
         screen_play.draw_screen()
 
         labels(score, WIDTH)
-        
+
         piece_sprite.update()
         screen_sprite.update()
      
         #pygame.display.update()
         pygame.display.flip()
-        #pygame.quit()
+      
     
 
 if __name__ == '__main__':  
