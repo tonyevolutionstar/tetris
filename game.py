@@ -1,3 +1,4 @@
+from re import X
 import pygame
 from pygame.locals import*
 from pieces import *
@@ -78,7 +79,13 @@ def main():
             elif event.type == pygame.KEYDOWN:
                 i = InputHandler()
                 image_ori, state = i.handleInput(event, image_ori, state)
-               
+                if event.key == pygame.K_z:# rotate left
+                    pieces.rotate()
+                    
+                elif event.key == pygame.K_UP: # rotate right
+                    pieces.rotate()
+                 
+
                 if pygame.Rect.colliderect(pieces.rect, wall_l[pieces.actual_piece]):
                     image_ori = (0, 0)
                     if event.key == pygame.K_RIGHT:

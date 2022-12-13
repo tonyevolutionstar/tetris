@@ -9,9 +9,11 @@ class InputHandler:
     """    
     def handleInput(self, event, image_ori, state):
         if event.key == pygame.K_z:
+
             pass # rotate left
-        elif event.key == pygame.K_UP:
-            pass # rotate right
+        elif event.key == pygame.K_UP: # rotate right
+
+            image_ori = (0, 1)
         elif event.key == pygame.K_LEFT :
             image_ori = (-1, 0)
         elif event.key == pygame.K_RIGHT:
@@ -25,6 +27,8 @@ class InputHandler:
         elif event.key == pygame.K_SPACE:
             state = "hard"
             image_ori = (0, 1)
+        else:
+            image_ori = (0, 0)
         
 
         return image_ori, state

@@ -13,9 +13,10 @@ class Piece(pygame.sprite.Sprite):
         self.pieces_dict = {}
         self.create_pieces()
         self.actual_piece = self.choice_pieces()
-        #self.actual_piece = "piece_z"
+        self.next_piece = self.choice_pieces()
         self.rect = self.pieces_dict[self.actual_piece]
         self.color = self.set_color_piece()
+        self.rotation = 0 # 0 to 3
         
 
     def create_pieces(self):
@@ -65,3 +66,21 @@ class Piece(pygame.sprite.Sprite):
             new_list.append((x_p + x, y_p + y))
         self.pieces_dict[self.actual_piece] = new_list
 
+
+
+    def rotate(self):
+        #https://github.com/StanislavPetrovV/Python-Tetris/blob/master/main.py
+        
+        if self.actual_piece != "piece_r":
+            new_l = []
+            
+            center = self.pieces_dict[self.actual_piece][1] # middle
+            x_c, y_c = center  
+            for x, y in self.pieces_dict[self.actual_piece]:
+                new_x = y - y_c
+                new_y = x - x_c
+                x = x_c - new_x
+                y = y_c + new_y
+                new_l.append((x,y))
+            self.pieces_dict[self.actual_piece] = new_l 
+    
