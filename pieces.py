@@ -8,17 +8,33 @@ class Piece(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.display = display
         self.scale = scale 
+        self.width = width
+        self.height = height
         self.x =  math.floor(width / 2)
         self.length = 4
         self.pieces_dict = {}
         self.create_pieces()
         self.actual_piece = self.choice_pieces()
-        self.next_piece = self.choice_pieces()
+        #self.next_p = self.choice_pieces()
+
         self.rect = self.pieces_dict[self.actual_piece]
         self.color = self.set_color_piece()
         self.rotation = 0 # 0 to 3
-        
+     
 
+        
+    def create_pieces(self):
+         self.pieces_dict = {
+            "piece_1": [(self.width,self.height), (self.width,self.height+1), (self.width,self.height+2), (self.width,self.height+3)],
+            "piece_l": [(self.width,self.height), (self.width,self.height+1), (self.width,self.height+2), (self.width+1,self.height+2)],
+            "piece_j": [(self.width,self.height), (self.width,self.height+1), (self.width,self.height+2), (self.width-1,self.height+2)],    
+            "piece_r": [(self.width,self.height), (self.width+1,self.height), (self.width,self.height+1), (self.width+1,self.height+1)],
+            "piece_s": [(self.width-1, self.height+1), (self.width, self.height+1), (self.width,self.height), (self.width+1, self.height)],
+            "piece_t": [(self.width-1, self.height+1), (self.width, self.height+1), (self.width+1, self.height+1), (self.width,self.height)],
+            "piece_z": [(self.width+1, self.height+1), (self.width, self.height+1), (self.width,self.height), (self.width-1, self.height)]
+        }
+    
+    """
     def create_pieces(self):
         self.pieces_dict = {
             "piece_1": [(self.x,1), (self.x,2), (self.x,3), (self.x,4)],
@@ -28,7 +44,9 @@ class Piece(pygame.sprite.Sprite):
             "piece_s": [(self.x-1, 2), (self.x, 2), (self.x,1), (self.x+1, 1)],
             "piece_t": [(self.x-1, 2), (self.x, 2), (self.x+1, 2), (self.x,1)],
             "piece_z": [(self.x+1, 2), (self.x, 2), (self.x,1), (self.x-1, 1)]
-        }
+        }s
+    """
+    
 
 
     def choice_pieces(self):
