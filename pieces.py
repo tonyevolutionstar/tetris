@@ -10,21 +10,8 @@ class Piece(pygame.sprite.Sprite):
         self.scale = scale 
         self.width = width
         self.height = height
-        self.x =  math.floor(width / 2)
         self.length = 4
-        self.pieces_dict = {}
-        self.create_pieces()
-        self.actual_piece = self.choice_pieces()
-        #self.next_p = self.choice_pieces()
-
-        self.rect = self.pieces_dict[self.actual_piece]
-        self.color = self.set_color_piece()
-        self.rotation = 0 # 0 to 3
-     
-
-        
-    def create_pieces(self):
-         self.pieces_dict = {
+        self.pieces_dict = {
             "piece_1": [(self.width,self.height), (self.width,self.height+1), (self.width,self.height+2), (self.width,self.height+3)],
             "piece_l": [(self.width,self.height), (self.width,self.height+1), (self.width,self.height+2), (self.width+1,self.height+2)],
             "piece_j": [(self.width,self.height), (self.width,self.height+1), (self.width,self.height+2), (self.width-1,self.height+2)],    
@@ -33,20 +20,10 @@ class Piece(pygame.sprite.Sprite):
             "piece_t": [(self.width-1, self.height+1), (self.width, self.height+1), (self.width+1, self.height+1), (self.width,self.height)],
             "piece_z": [(self.width+1, self.height+1), (self.width, self.height+1), (self.width,self.height), (self.width-1, self.height)]
         }
-    
-    """
-    def create_pieces(self):
-        self.pieces_dict = {
-            "piece_1": [(self.x,1), (self.x,2), (self.x,3), (self.x,4)],
-            "piece_l": [(self.x,1), (self.x,2), (self.x,3), (self.x+1,3)],
-            "piece_j": [(self.x,1), (self.x,2), (self.x,3), (self.x-1,3)],    
-            "piece_r": [(self.x,1), (self.x+1,1), (self.x,2), (self.x+1,2)],
-            "piece_s": [(self.x-1, 2), (self.x, 2), (self.x,1), (self.x+1, 1)],
-            "piece_t": [(self.x-1, 2), (self.x, 2), (self.x+1, 2), (self.x,1)],
-            "piece_z": [(self.x+1, 2), (self.x, 2), (self.x,1), (self.x-1, 1)]
-        }s
-    """
-    
+   
+        self.actual_piece = ""
+        self.color = ""
+        self.rotation = 0 # 0 to 3
 
 
     def choice_pieces(self):
@@ -58,6 +35,7 @@ class Piece(pygame.sprite.Sprite):
                 pieces_choosed = piece
 
         return pieces_choosed
+    
 
 
     def set_color_piece(self):
@@ -70,7 +48,10 @@ class Piece(pygame.sprite.Sprite):
 
 
     def fill_piece(self):
+        self.rect = self.pieces_dict[self.actual_piece]
+        
         for x,y in self.pieces_dict[self.actual_piece]:
+            
             self.rect = pygame.Rect(self.scale * x, self.scale * y, self.scale, self.scale)
             pygame.draw.rect(self.display, self.color, (self.scale * x, self.scale * y, self.scale, self.scale))
                    
@@ -80,7 +61,6 @@ class Piece(pygame.sprite.Sprite):
         x, y = vector
     
         for x_p, y_p in self.pieces_dict[self.actual_piece]:
-            
             new_list.append((x_p + x, y_p + y))
         self.pieces_dict[self.actual_piece] = new_list
 
@@ -91,7 +71,6 @@ class Piece(pygame.sprite.Sprite):
         
         if self.actual_piece != "piece_r":
             new_l = []
-            
             center = self.pieces_dict[self.actual_piece][1] # middle
             x_c, y_c = center  
             for x, y in self.pieces_dict[self.actual_piece]:

@@ -18,7 +18,10 @@ clock = pygame.time.Clock()
 clock.tick(24)
 piece_sprite = pygame.sprite.Group()
 next_p_sprite = pygame.sprite.Group()
+hold_sprite = pygame.sprite.Group()
 screen_sprite = pygame.sprite.Group()
+
+
 score_label = Font(None, 20)
 flag_next_piece = False
 pygame.display.set_caption("Tetris")
@@ -42,21 +45,26 @@ def labels(score, WIDTH):
     pygame.Surface.blit(screen, next_piece_label, (WIDTH * SCALE - 100, 200))
 
 
-def next_piece(next_p):
-    flag_next_piece = True
-    next_p_sprite.add(next_p)
-    next_p.fill_piece()
-    next_p_sprite.update()
-   
-    
+def generate_piece():
+    piece = Piece(screen, SCALE, (WIDTH-10)/2, 1)
+    piece.actual_piece = piece.choice_pieces()
+    piece.color = piece.set_color_piece()
+    return piece
+
+def next_piece():
+    next_p = Piece(screen, SCALE, WIDTH - 8, (HEIGHT/2) - 5)
+    next_p.actual_piece = next_p.choice_pieces()
+    next_p.color = next_p.set_color_piece()
+    return next_p
+
 
 def main():
-    pieces = Piece(screen, SCALE, (WIDTH-10)/2, 1)
-    next_p = Piece(screen, SCALE, WIDTH - 8, (HEIGHT/2) - 5)
+    count = 1
+    piece = generate_piece()
+    next_p = next_piece()
     next_p_sprite.add(next_p)
-    piece_sprite.add(pieces)
-  
-
+    piece_sprite.add(piece)
+    hold_p = Piece(screen, SCALE, 2, 5)
     screen_play = Screen_play(screen, 70, 5, 30, 60, SCALE)
     piece_sprite.add(screen_play)
     
@@ -84,52 +92,94 @@ def main():
 
 
     while running:
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit() #shuts down pyGame
                 running = 0
             elif event.type == pygame.KEYDOWN:
                 i = InputHandler()
-                image_ori, state = i.handleInput(event, image_ori, state)
+                image_ori, state, count = i.handleInput(event, image_ori, state, count)
+
+                if count % 2 != 0:
+                    state ="soft"
+
                 if event.key == pygame.K_z:# rotate left
-                    pieces.rotate()
+                    piece.rotate()
                 elif event.key == pygame.K_UP: # rotate right
-                    pieces.rotate()
+                    piece.rotate()
                  
 
-                if pygame.Rect.colliderect(pieces.rect, wall_l[pieces.actual_piece]):
+                if pygame.Rect.colliderect(piece.rect, wall_l[piece.actual_piece]):
                     image_ori = (0, 0)
                     if event.key == pygame.K_RIGHT:
                         image_ori = (1, 0)
                     elif event.key == pygame.K_DOWN:
                         image_ori = (0, 1)
-                elif pygame.Rect.colliderect(pieces.rect, wall_r[pieces.actual_piece]):
+                elif pygame.Rect.colliderect(piece.rect, wall_r[piece.actual_piece]):
                     image_ori = (0, 0)    
                     if event.key == pygame.K_LEFT:
                         image_ori = (-1, 0)
                     elif event.key == pygame.K_DOWN:
                         image_ori = (0, 1)
-                elif pygame.Rect.colliderect(pieces.rect, wall_b):
+                elif pygame.Rect.colliderect(piece.rect, wall_b):
                     image_ori = (0, 0)    
                     if event.key == pygame.K_LEFT:
                         image_ori = (-1, 0)
                     elif event.key == pygame.K_RIGHT:
                         image_ori = (1, 0)
                 
-                pieces.change_dir(image_ori)
-             
+                piece.change_dir(image_ori)
+               
       
         screen.fill((255, 255, 255))
-        pieces.fill_piece()
+        piece.fill_piece()
         next_p.fill_piece()
         screen_play.draw_screen()
 
         labels(score, WIDTH)
-    
+
+
         piece_sprite.update()
         next_p_sprite.update()
         screen_sprite.update()
-        
+
+        if hold_p.actual_piece != "":
+            hold_p.fill_piece()
+            hold_p.change_dir((0,0))
+            hold_sprite.add(hold_p)
+            hold_sprite.update()
+    
+    
+        #print(count)
+        #print("count % 2 ", count % 2)
+        if state == "hold":
+            if hold_p.actual_piece == "":
+                # a peça atual vai ser a hold, e a proxima vai passar À atual
+                hold_p.actual_piece = piece.actual_piece
+                hold_p.color = piece.color
+
+                piece.actual_piece = next_p.actual_piece
+                piece.color = next_p.color
+                piece.fill_piece()
+                next_p = next_piece()
+                next_p.fill_piece()
+            # vou remover a peça do hold e mete la como atual    
+            if count % 2 == 1 and hold_p.actual_piece != "":
+                piece.actual_piece = hold_p.actual_piece
+                piece.color = hold_p.color
+                hold_p.actual_piece = piece.actual_piece
+                hold_p.color = piece.color
+               
+              
+
+                
+            if count % 2 == 0:
+                hold_p.fill_piece()
+                piece.fill_piece()
+                hold_sprite.add(hold_p)
+                hold_sprite.update()
+
         #pygame.display.update()
         pygame.display.flip()
       
