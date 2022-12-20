@@ -7,7 +7,7 @@ class InputHandler:
     state = "hard", "soft", "hold" 
     first three are drops, the last is hold the piece
     """    
-    def handleInput(self, event, image_ori, state, count):
+    def handleInput(self, event, image_ori, state, count, score_tetris):
        # for hold 
         if event.key == pygame.K_z:
 
@@ -27,6 +27,7 @@ class InputHandler:
         elif event.key == pygame.K_DOWN:
             state = "soft"
             image_ori = (0, 1)
+            score_tetris += 1
         elif event.key == pygame.K_SPACE:
             state = "hard"
             image_ori = (0, 1)
@@ -34,4 +35,4 @@ class InputHandler:
             image_ori = (0, 0)
         
 
-        return image_ori, state, self.count
+        return image_ori, state, self.count, score_tetris

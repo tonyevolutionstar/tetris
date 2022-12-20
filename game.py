@@ -1,4 +1,5 @@
 import pygame
+
 from pygame.locals import*
 from pieces import *
 from pygame.sprite import *
@@ -25,6 +26,7 @@ score_label = Font(None, 20)
 flag_next_piece = False
 pygame.display.set_caption("Tetris")
 
+
 def labels(score, WIDTH):
     score_surface = score_label.render("Score", True, (0,0,0))
     level_surface = score_label.render("Level", True, (0,0,0))
@@ -42,6 +44,8 @@ def labels(score, WIDTH):
     pygame.Surface.blit(screen, lines_surface, (WIDTH * SCALE - 100, 70))
     pygame.Surface.blit(screen, lines_score, (WIDTH * SCALE - 100, 85))
     pygame.Surface.blit(screen, next_piece_label, (WIDTH * SCALE - 100, 200))
+    return text_score
+
 
 
 def generate_piece():
@@ -57,10 +61,15 @@ def next_piece():
     return next_p
 
 
+def calculateLevelAndFallFreq(score):
+    # from https://inventwithpython.com/pygame/chapter7.html line 356 - 361
+    level = int(score / 10) + 1
+    fallFreq = 0.27 - (level * 0.02)
+    return level, fallFreq  
+
+
 def main():
-    fall_time = 0
-    level_time = 0
-    fall_speed = 0.27
+    
     count = 1
     piece = generate_piece()
     next_p = next_piece()
@@ -71,7 +80,10 @@ def main():
     piece_sprite.add(screen_play)
     
     score = ScoreBoard()
-   
+    fall_time = 0
+    level_time = 0
+
+
     image_ori = (0, -1)
     state = "soft"
     running = 1
@@ -102,7 +114,7 @@ def main():
                 running = 0
             elif event.type == pygame.KEYDOWN:
                 i = InputHandler()
-                image_ori, state, count = i.handleInput(event, image_ori, state, count)
+                image_ori, state, count, score.score = i.handleInput(event, image_ori, state, count, score.score)
 
                 if count % 2 != 0:
                     state ="soft"
@@ -152,11 +164,11 @@ def main():
                    
                     elif event.key == pygame.K_DOWN:
                         image_ori = (0, 0)  
+                        score.score += 1
 
-                
                 piece.change_dir(image_ori)
                
-      
+        print(score.score)
         screen.fill((255, 255, 255))
         piece.fill_piece()
         next_p.fill_piece()
@@ -164,10 +176,10 @@ def main():
 
         labels(score, WIDTH)
 
-
         piece_sprite.update()
         next_p_sprite.update()
         screen_sprite.update()
+        
 
         if hold_p.actual_piece != "":
             hold_p.fill_piece()
