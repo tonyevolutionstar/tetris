@@ -68,10 +68,12 @@ def calculateLevelAndFallFreq(score):
     return level, fallFreq  
 
 
+
 def main():
-    
+    flag_hard = 0
     count = 1
     piece = generate_piece()
+    
     next_p = next_piece()
     next_p_sprite.add(next_p)
     piece_sprite.add(piece)
@@ -113,20 +115,8 @@ def main():
                 pygame.quit() #shuts down pyGame
                 running = 0
             elif event.type == pygame.KEYDOWN:
-                i = InputHandler()
-                image_ori, state, count, score.score = i.handleInput(event, image_ori, state, count, score.score)
-
-                if count % 2 != 0:
-                    state ="soft"
-
-                if event.key == pygame.K_z:# rotate left
-                    piece.rotate()
-                elif event.key == pygame.K_UP: # rotate right
-                    piece.rotate()
-
-                print(piece.rect) 
                 x_p, y_p, w_p, h_p = piece.rect
-                
+             
                 wall_b = {"piece_1": pygame.Rect(x_p, 590, w_p, h_p), 
                     "piece_l": pygame.Rect(x_p, 590,  w_p, h_p),
                     "piece_j": pygame.Rect(x_p, 590,  w_p, h_p),
@@ -135,46 +125,62 @@ def main():
                     "piece_t": pygame.Rect(x_p, 590, w_p, h_p),
                     "piece_z": pygame.Rect(x_p, 590,  w_p, h_p)
                 }
+                x_b, y_b, w_b, h_b = wall_b[piece.actual_piece]
 
+                i = InputHandler()
+                image_ori, state, count, score.score = i.handleInput(event, image_ori, state, count, score.score)
 
+                if state == "hard":
+                 
+                 
+                    flag_hard = 1
+                
+                    score.score += round(y_b/10)
+
+                if count % 2 != 0:
+                    state ="soft"
+
+                # Rotate 
+                if event.key == pygame.K_z:# rotate left
+                    piece.rotate()
+                elif event.key == pygame.K_UP: # rotate right
+                    piece.rotate()
+
+              
+                
                 if pygame.Rect.colliderect(piece.rect, wall_l[piece.actual_piece]):
                     image_ori = (0, 0)
                     if event.key == pygame.K_RIGHT:
                         image_ori = (1, 0)
-             
                 elif pygame.Rect.colliderect(piece.rect, wall_r[piece.actual_piece]):
                     image_ori = (0, 0)    
                     if event.key == pygame.K_LEFT:
                         image_ori = (-1, 0)
-                   
-                elif pygame.Rect.colliderect(piece.rect, wall_b[piece.actual_piece]):
-                    print("collide on buttom")
-                     
+                elif pygame.Rect.colliderect(piece.rect, wall_b[piece.actual_piece]):                     
                     if event.key == pygame.K_LEFT:
                         if pygame.Rect.colliderect(piece.rect, wall_l[piece.actual_piece]):
                             image_ori = (0, 0)
                         if event.key == pygame.K_RIGHT:
                             image_ori = (1, 0)
-                    
                     elif event.key == pygame.K_RIGHT:
                        if pygame.Rect.colliderect(piece.rect, wall_r[piece.actual_piece]):
                         image_ori = (0, 0)    
                         if event.key == pygame.K_LEFT:
                             image_ori = (-1, 0)
-                   
                     elif event.key == pygame.K_DOWN:
                         image_ori = (0, 0)  
-                        score.score += 1
+
+             
 
                 piece.change_dir(image_ori)
                
-        print(score.score)
         screen.fill((255, 255, 255))
         piece.fill_piece()
         next_p.fill_piece()
         screen_play.draw_screen()
 
         labels(score, WIDTH)
+        #print(state)
 
         piece_sprite.update()
         next_p_sprite.update()
@@ -186,7 +192,22 @@ def main():
             hold_p.change_dir((0,0))
             hold_sprite.add(hold_p)
             hold_sprite.update()
-    
+
+        if flag_hard == 1:
+            sub_bottom = {"piece_1": 3, 
+                    "piece_l": 2,
+                    "piece_j": 2,
+                    "piece_r": 1,
+                    "piece_s": 1,
+                    "piece_t": 1,
+                    "piece_z": 1}
+
+            p = Piece(screen, SCALE, round(x_b/10), round(y_b/10)-sub_bottom[piece.actual_piece])
+            p.actual_piece = piece.actual_piece
+            p.color = piece.color                   
+            pieces_g_sprite.add(p)
+            p.fill_piece()
+            pieces_g_sprite.update()
 
         if state == "hold":
             if hold_p.actual_piece == "":

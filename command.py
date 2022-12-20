@@ -34,5 +34,5 @@ class InputHandler:
         else:
             image_ori = (0, 0)
         
-
+        print(state)
         return image_ori, state, self.count, score_tetris
