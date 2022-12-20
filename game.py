@@ -19,9 +19,8 @@ clock.tick(24)
 piece_sprite = pygame.sprite.Group()
 next_p_sprite = pygame.sprite.Group()
 hold_sprite = pygame.sprite.Group()
+pieces_g_sprite = pygame.sprite.Group()
 screen_sprite = pygame.sprite.Group()
-
-
 score_label = Font(None, 20)
 flag_next_piece = False
 pygame.display.set_caption("Tetris")
@@ -59,6 +58,9 @@ def next_piece():
 
 
 def main():
+    fall_time = 0
+    level_time = 0
+    fall_speed = 0.27
     count = 1
     piece = generate_piece()
     next_p = next_piece()
@@ -69,6 +71,7 @@ def main():
     piece_sprite.add(screen_play)
     
     score = ScoreBoard()
+   
     image_ori = (0, -1)
     state = "soft"
     running = 1
@@ -88,11 +91,11 @@ def main():
               "piece_t": pygame.Rect(350, 0, 10, 580),
               "piece_z": pygame.Rect(340, 0, 10, 580)}
 
-    wall_b = pygame.Rect(0, 580, 0, 0)
-
+  
 
     while running:
-
+        fall_time += clock.get_rawtime()
+        level_time += clock.get_rawtime()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit() #shuts down pyGame
@@ -108,26 +111,48 @@ def main():
                     piece.rotate()
                 elif event.key == pygame.K_UP: # rotate right
                     piece.rotate()
-                 
+
+                print(piece.rect) 
+                x_p, y_p, w_p, h_p = piece.rect
+                
+                wall_b = {"piece_1": pygame.Rect(x_p, 590, w_p, h_p), 
+                    "piece_l": pygame.Rect(x_p, 590,  w_p, h_p),
+                    "piece_j": pygame.Rect(x_p, 590,  w_p, h_p),
+                    "piece_r": pygame.Rect(x_p, 590,  w_p, h_p),
+                    "piece_s": pygame.Rect(x_p, 590,  w_p, h_p),
+                    "piece_t": pygame.Rect(x_p, 590, w_p, h_p),
+                    "piece_z": pygame.Rect(x_p, 590,  w_p, h_p)
+                }
+
 
                 if pygame.Rect.colliderect(piece.rect, wall_l[piece.actual_piece]):
                     image_ori = (0, 0)
                     if event.key == pygame.K_RIGHT:
                         image_ori = (1, 0)
-                    elif event.key == pygame.K_DOWN:
-                        image_ori = (0, 1)
+             
                 elif pygame.Rect.colliderect(piece.rect, wall_r[piece.actual_piece]):
                     image_ori = (0, 0)    
                     if event.key == pygame.K_LEFT:
                         image_ori = (-1, 0)
-                    elif event.key == pygame.K_DOWN:
-                        image_ori = (0, 1)
-                elif pygame.Rect.colliderect(piece.rect, wall_b):
-                    image_ori = (0, 0)    
+                   
+                elif pygame.Rect.colliderect(piece.rect, wall_b[piece.actual_piece]):
+                    print("collide on buttom")
+                     
                     if event.key == pygame.K_LEFT:
-                        image_ori = (-1, 0)
+                        if pygame.Rect.colliderect(piece.rect, wall_l[piece.actual_piece]):
+                            image_ori = (0, 0)
+                        if event.key == pygame.K_RIGHT:
+                            image_ori = (1, 0)
+                    
                     elif event.key == pygame.K_RIGHT:
-                        image_ori = (1, 0)
+                       if pygame.Rect.colliderect(piece.rect, wall_r[piece.actual_piece]):
+                        image_ori = (0, 0)    
+                        if event.key == pygame.K_LEFT:
+                            image_ori = (-1, 0)
+                   
+                    elif event.key == pygame.K_DOWN:
+                        image_ori = (0, 0)  
+
                 
                 piece.change_dir(image_ori)
                
@@ -150,9 +175,7 @@ def main():
             hold_sprite.add(hold_p)
             hold_sprite.update()
     
-    
-        #print(count)
-        #print("count % 2 ", count % 2)
+
         if state == "hold":
             if hold_p.actual_piece == "":
                 # a peça atual vai ser a hold, e a proxima vai passar À atual
@@ -171,9 +194,6 @@ def main():
                 hold_p.actual_piece = piece.actual_piece
                 hold_p.color = piece.color
                
-              
-
-                
             if count % 2 == 0:
                 hold_p.fill_piece()
                 piece.fill_piece()
