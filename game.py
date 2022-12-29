@@ -1,30 +1,26 @@
-import pygame
-
-from pygame.locals import*
-from pieces import *
-from pygame.sprite import *
-from pygame.font import *
-from pygame import *
-from command import InputHandler
+import pygame 
+from piece import Piece
+from command import *
 from scoreboard import ScoreBoard
 from screen_play import Screen_play
 
+
+from pygame.font import *
+from pygame.sprite import *
+
 pygame.init() # starts up pyGame
 
-WIDTH, HEIGHT = 50, 60
+WIDTH, HEIGHT = 30, 40
 SCALE = 10
 
 screen = pygame.display.set_mode((SCALE * WIDTH, SCALE * HEIGHT))
 clock = pygame.time.Clock()
-clock.tick(24)
-piece_sprite = pygame.sprite.Group()
-next_p_sprite = pygame.sprite.Group()
-hold_sprite = pygame.sprite.Group()
-pieces_g_sprite = pygame.sprite.Group()
-screen_sprite = pygame.sprite.Group()
 score_label = Font(None, 20)
-flag_next_piece = False
 pygame.display.set_caption("Tetris")
+
+screen_sprite = pygame.sprite.Group()
+falling_piece_sprite = pygame.sprite.Group()
+next_piece_sprite = pygame.sprite.Group()
 
 
 def labels(score, WIDTH):
@@ -39,203 +35,220 @@ def labels(score, WIDTH):
     pygame.Surface.blit(screen, hold_surface, (10, 10))
     pygame.Surface.blit(screen, score_surface, (WIDTH * SCALE - 100, 10))
     pygame.Surface.blit(screen, text_score, (WIDTH * SCALE - 100, 25))
-    pygame.Surface.blit(screen, level_surface, (WIDTH * SCALE - 100, 40))
-    pygame.Surface.blit(screen, level_score, (WIDTH * SCALE - 100, 55))
-    pygame.Surface.blit(screen, lines_surface, (WIDTH * SCALE - 100, 70))
-    pygame.Surface.blit(screen, lines_score, (WIDTH * SCALE - 100, 85))
+    pygame.Surface.blit(screen, level_surface, (WIDTH * SCALE - 100, 50))
+    pygame.Surface.blit(screen, level_score, (WIDTH * SCALE - 100, 65))
+    pygame.Surface.blit(screen, lines_surface, (WIDTH * SCALE - 100, 90))
+    pygame.Surface.blit(screen, lines_score, (WIDTH * SCALE - 100, 105))
     pygame.Surface.blit(screen, next_piece_label, (WIDTH * SCALE - 100, 200))
     return text_score
 
+def generate_falling_piece():
+    fall_piece = Piece(screen, SCALE, int((WIDTH-5)/2), 2)
+    fall_piece.piece = "1"
+    #fall_piece.choose_piece()
+    fall_piece.set_coord()
+    return fall_piece 
 
-
-def generate_piece():
-    piece = Piece(screen, SCALE, (WIDTH-10)/2, 1)
-    piece.actual_piece = piece.choice_pieces()
-    piece.color = piece.set_color_piece()
-    return piece
-
-def next_piece():
-    next_p = Piece(screen, SCALE, WIDTH - 8, (HEIGHT/2) - 5)
-    next_p.actual_piece = next_p.choice_pieces()
-    next_p.color = next_p.set_color_piece()
+def generate_next_piece():
+    next_p = Piece(screen, SCALE, WIDTH - 8, (HEIGHT/2) + 5)
+    next_p.choose_piece()
+    next_p.set_coord()
     return next_p
 
+def validate_space(falling_piece, grid, ori):
+    # verify if falling piece is free space when reaches bottom
+    # falling piece is a list of the coordinates of the piece
+    # grid already was free pos with white color
+    x_dir, y_dir = ori
 
-def calculateLevelAndFallFreq(score):
-    # from https://inventwithpython.com/pygame/chapter7.html line 356 - 361
-    level = int(score / 10) + 1
-    fallFreq = 0.27 - (level * 0.02)
-    return level, fallFreq  
+    free_pos = []
+    for val in grid:
+        if grid[val] == "white":
+            print(val)
+            free_pos.append(val)
+
+    for pos in falling_piece:
+        x,y = pos
+        new_p = (x + x_dir, y + y_dir)
+
+        if new_p not in free_pos:
+            if new_p[1] > 1:
+                return False
+    
+    return True
+
+def validate_rotate(piece, falling_piece, grid):
+    new_l = []
+    if piece != "R":
+        center = falling_piece[3] # middle
+        x_c, y_c = center  
+        free_pos = []
+        for val in grid:
+            if grid[val] == "white":
+                free_pos.append(val)
+
+        for pos in falling_piece:
+            x,y = pos
+            new_x = y - y_c
+            new_y = x - x_c
+            x = x_c - new_x
+            y = y_c + new_y
+
+            new_p = (x, y)
+            new_l.append(new_p)
+            if new_p not in free_pos:
+                if new_p[1] > 1:
+                    return False, new_l
+    else:
+        return False, new_l
+    return True, new_l
+
+def validate_rotate_r(piece, falling_piece, grid):
+    new_l = []
+    if piece != "R":
+        center = falling_piece[3] # middle
+        x_c, y_c = center  
+        free_pos = []
+        for val in grid:
+            if grid[val] == "white":
+                free_pos.append(val)
+
+        for pos in falling_piece:
+            x,y = pos
+            new_x = y - y_c
+            new_y = x - x_c
+            x = x_c + new_x
+            y = y_c - new_y
+
+            new_p = (x, y)
+            new_l.append(new_p)
+            if new_p not in free_pos:
+                if new_p[1] > 1:
+                    return False, new_l
+    else:
+        return False, new_l
+    return True, new_l
 
 
+def set_grid(grid, fall_piece, color):
+    for val_pos in fall_piece:   
+        grid[val_pos] = color
+        print(val_pos, grid[val_pos])
+    return grid
 
 def main():
-    flag_hard = 0
+    x_left = 80
+    x_right = 180 
+    y_top = 20
+    y_bottom = 220 
+
+    run = 1
+    orientation_piece = (0, 1)
+    state = "soft"
     count = 1
-    piece = generate_piece()
-    
-    next_p = next_piece()
-    next_p_sprite.add(next_p)
-    piece_sprite.add(piece)
-    hold_p = Piece(screen, SCALE, 2, 5)
-    screen_play = Screen_play(screen, 70, 5, 30, 60, SCALE)
-    piece_sprite.add(screen_play)
-    
-    score = ScoreBoard()
+    flag_rotate = 0
+    fall_speed = 0.27
     fall_time = 0
     level_time = 0
+    change_piece = False # trigger to change piece
 
+    screen_play = Screen_play(screen, x_left, x_right, y_top, y_bottom, SCALE)
+    screen_sprite.add(screen_play)
+   
+    score = ScoreBoard()
 
-    image_ori = (0, -1)
-    state = "soft"
-    running = 1
-    wall_l = {"piece_1": pygame.Rect(70, 0, 10, 580), 
-              "piece_l": pygame.Rect(80, 0, 10, 580),
-              "piece_j": pygame.Rect(70, 0, 10, 580),
-              "piece_r": pygame.Rect(80, 0, 10, 580),
-              "piece_s": pygame.Rect(90, 0, 10, 580),
-              "piece_t": pygame.Rect(80, 0, 10, 580),
-              "piece_z": pygame.Rect(70, 0, 10, 580) }
+    #pieces
+    fall_piece = generate_falling_piece()
+    falling_piece_sprite.add(fall_piece)
+    next_piece = generate_next_piece()
+    next_piece_sprite.add(next_piece)
+    hold_piece = Piece(screen, SCALE, 2, 5)
+    
+    #dimensions grid 10x20
+    #screen_play.set_grid(fall_piece.coord[fall_piece.piece], fall_piece.color_piece[fall_piece.piece])
 
-    wall_r = {"piece_1": pygame.Rect(360, 0, 10, 580), 
-              "piece_l": pygame.Rect(360, 0, 10, 580),
-              "piece_j": pygame.Rect(350, 0, 10, 580),
-              "piece_r": pygame.Rect(360, 0, 10, 580),
-              "piece_s": pygame.Rect(360, 0, 10, 580),
-              "piece_t": pygame.Rect(350, 0, 10, 580),
-              "piece_z": pygame.Rect(340, 0, 10, 580)}
-
-  
-
-    while running:
+    
+    screen_play.create_grid()
+    while run:
+      
         fall_time += clock.get_rawtime()
         level_time += clock.get_rawtime()
+        clock.tick()
+
+        #print("position piece", fall_piece.coord[fall_piece.piece])
+
+        if level_time/1000 > 4:
+            level_time = 0
+            if fall_speed > 0.15:
+                fall_speed -= 0.005
+
+        if fall_time/1000 >= fall_speed:
+            fall_time = 0
+            orientation_piece = (0, 1)
+            #print("position piece", fall_piece.coord[fall_piece.piece])
+            if validate_space(fall_piece.coord[fall_piece.piece], screen_play.grid, orientation_piece):
+                fall_piece.set_pos(orientation_piece) 
+                score.score += 1
+            
+            #fall_piece.set_pos(orientation_piece)   
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit() #shuts down pyGame
-                running = 0
+                run = 0
             elif event.type == pygame.KEYDOWN:
-                x_p, y_p, w_p, h_p = piece.rect
-             
-                wall_b = {"piece_1": pygame.Rect(x_p, 590, w_p, h_p), 
-                    "piece_l": pygame.Rect(x_p, 590,  w_p, h_p),
-                    "piece_j": pygame.Rect(x_p, 590,  w_p, h_p),
-                    "piece_r": pygame.Rect(x_p, 590,  w_p, h_p),
-                    "piece_s": pygame.Rect(x_p, 590,  w_p, h_p),
-                    "piece_t": pygame.Rect(x_p, 590, w_p, h_p),
-                    "piece_z": pygame.Rect(x_p, 590,  w_p, h_p)
-                }
-                x_b, y_b, w_b, h_b = wall_b[piece.actual_piece]
-
-                i = InputHandler()
-                image_ori, state, count, score.score = i.handleInput(event, image_ori, state, count, score.score)
-
-                if state == "hard":
-                 
-                 
-                    flag_hard = 1
+                i = InputHandler()    
+                orientation_piece, state, count = i.handleInput(event, orientation_piece, state, count)               
                 
-                    score.score += round(y_b/10)
+                if event.key == pygame.K_LEFT:
+                    orientation_piece = (-1, 0)
+                    if validate_space(fall_piece.coord[fall_piece.piece], screen_play.grid, orientation_piece):
+                        fall_piece.set_pos(orientation_piece)  
+                elif event.key == pygame.K_RIGHT:
+                    orientation_piece = (1, 0)
+                    if validate_space(fall_piece.coord[fall_piece.piece], screen_play.grid, orientation_piece):
+                        fall_piece.set_pos(orientation_piece) 
+                elif event.key == pygame.K_DOWN:
+                    state = "soft"
+                    orientation_piece = (0, 1)
+                    if validate_space(fall_piece.coord[fall_piece.piece], screen_play.grid, orientation_piece):
+                        fall_piece.set_pos(orientation_piece) 
+                        score.score += 1
 
-                if count % 2 != 0:
-                    state ="soft"
-
-                # Rotate 
                 if event.key == pygame.K_z:# rotate left
-                    piece.rotate()
+                    val_rot, pos = validate_rotate(fall_piece.piece, fall_piece.coord[fall_piece.piece], screen_play.grid)
+                    if val_rot:
+                        fall_piece.coord[fall_piece.piece] = pos
+                        
+
                 elif event.key == pygame.K_UP: # rotate right
-                    piece.rotate()
+                    val_rot, pos = validate_rotate_r(fall_piece.piece, fall_piece.coord[fall_piece.piece], screen_play.grid)
+                    if val_rot:
+                        fall_piece.coord[fall_piece.piece] = pos
 
-              
-                
-                if pygame.Rect.colliderect(piece.rect, wall_l[piece.actual_piece]):
-                    image_ori = (0, 0)
-                    if event.key == pygame.K_RIGHT:
-                        image_ori = (1, 0)
-                elif pygame.Rect.colliderect(piece.rect, wall_r[piece.actual_piece]):
-                    image_ori = (0, 0)    
-                    if event.key == pygame.K_LEFT:
-                        image_ori = (-1, 0)
-                elif pygame.Rect.colliderect(piece.rect, wall_b[piece.actual_piece]):                     
-                    if event.key == pygame.K_LEFT:
-                        if pygame.Rect.colliderect(piece.rect, wall_l[piece.actual_piece]):
-                            image_ori = (0, 0)
-                        if event.key == pygame.K_RIGHT:
-                            image_ori = (1, 0)
-                    elif event.key == pygame.K_RIGHT:
-                       if pygame.Rect.colliderect(piece.rect, wall_r[piece.actual_piece]):
-                        image_ori = (0, 0)    
-                        if event.key == pygame.K_LEFT:
-                            image_ori = (-1, 0)
-                    elif event.key == pygame.K_DOWN:
-                        image_ori = (0, 0)  
+                #fall_piece.set_pos(orientation_piece)    
+                #screen_play.set_grid(fall_piece.coord[fall_piece.piece], fall_piece.color_piece[fall_piece.piece])
 
-             
+        if change_piece:
+            screen_play.set_grid(fall_piece.coord[fall_piece.piece], fall_piece.color_piece[fall_piece.piece])
+            fall_piece.piece = next_piece.piece
+            screen_play.fill()
+            next_piece = generate_next_piece()
+            change_piece = False
 
-                piece.change_dir(image_ori)
-               
-        screen.fill((255, 255, 255))
-        piece.fill_piece()
-        next_p.fill_piece()
-        screen_play.draw_screen()
 
+        screen.fill("white")   
         labels(score, WIDTH)
-        #print(state)
-
-        piece_sprite.update()
-        next_p_sprite.update()
-        screen_sprite.update()
-        
-
-        if hold_p.actual_piece != "":
-            hold_p.fill_piece()
-            hold_p.change_dir((0,0))
-            hold_sprite.add(hold_p)
-            hold_sprite.update()
-
-        if flag_hard == 1:
-            sub_bottom = {"piece_1": 3, 
-                    "piece_l": 2,
-                    "piece_j": 2,
-                    "piece_r": 1,
-                    "piece_s": 1,
-                    "piece_t": 1,
-                    "piece_z": 1}
-
-            p = Piece(screen, SCALE, round(x_b/10), round(y_b/10)-sub_bottom[piece.actual_piece])
-            p.actual_piece = piece.actual_piece
-            p.color = piece.color                   
-            pieces_g_sprite.add(p)
-            p.fill_piece()
-            pieces_g_sprite.update()
-
-        if state == "hold":
-            if hold_p.actual_piece == "":
-                # a peça atual vai ser a hold, e a proxima vai passar À atual
-                hold_p.actual_piece = piece.actual_piece
-                hold_p.color = piece.color
-
-                piece.actual_piece = next_p.actual_piece
-                piece.color = next_p.color
-                piece.fill_piece()
-                next_p = next_piece()
-                next_p.fill_piece()
-            # vou remover a peça do hold e mete la como atual    
-            if count % 2 == 1 and hold_p.actual_piece != "":
-                piece.actual_piece = hold_p.actual_piece
-                piece.color = hold_p.color
-                hold_p.actual_piece = piece.actual_piece
-                hold_p.color = piece.color
-               
-            if count % 2 == 0:
-                hold_p.fill_piece()
-                piece.fill_piece()
-                hold_sprite.add(hold_p)
-                hold_sprite.update()
-
-        #pygame.display.update()
-        pygame.display.flip()
+        fall_piece.fill()
+        next_piece.fill()
+        #screen_play.fill()
+        screen_play.draw_grid()
       
+        screen_sprite.update()
+        falling_piece_sprite.update()
+        next_piece_sprite.update()
+        pygame.display.flip()
+
 
 if __name__ == '__main__':  
     main()

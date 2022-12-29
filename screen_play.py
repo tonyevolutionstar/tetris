@@ -1,14 +1,42 @@
+from tkinter import Grid
 import pygame 
 
 class Screen_play(pygame.sprite.Sprite):
-    def __init__(self, display, x, y, width, height, SCALE):
+    def __init__(self, display, x_l, x_r, top, bottom, scale):
         pygame.sprite.Sprite.__init__(self)
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.rect =  pygame.Rect(x, y, width * SCALE, height * SCALE)
+        self.x_l = x_l
+        self.x_r = x_r
+        self.top = top
+        self.bottom = bottom
         self.display = display
+        self.scale = scale
+        self.grid = {}
+
+    def create_grid(self):
+        for x in range(self.x_l, self.x_r, self.scale):
+            for y in range(self.top, self.bottom, self.scale):
+                print("grid ", (int(x/10),int(y/10)))
+                self.grid[int(x/10), int(y/10)] = "white"
+
+    def set_grid(self, pos, color):
+        for val_pos in pos:   
+            x,y = val_pos
+            self.grid[val_pos] = color
+            print(val_pos, self.grid[val_pos])
+          
+
+
+    def draw_grid(self):
+        for x in range(self.x_l, self.x_r, self.scale):
+            for y in range(self.top, self.bottom, self.scale):
+                self.rect = pygame.Rect(x, y , self.scale, self.scale)
+                pygame.draw.rect(self.display, (223, 223, 223), self.rect, 1)
+
+    def fill(self):
+        for val in self.grid:
+            x, y = val
+            self.rect = pygame.Rect(x * self.scale, y * self.scale, self.scale, self.scale)
+            pygame.draw.rect(self.display, self.grid[val], self.rect)
+
+    
         
-    def draw_screen(self):
-        pygame.draw.rect(self.display, (0,0,0), self.rect, 2)
