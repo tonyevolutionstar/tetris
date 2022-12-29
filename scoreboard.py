@@ -5,6 +5,7 @@ class ScoreBoard:
         self.level = 1
         self.lines = 0
         self.action = None
+        self.lost = ""
 
     #state - soft, hard drop
     def handle_score(self, action, state):
@@ -21,6 +22,3 @@ class ScoreBoard:
             self.score += 500 * self.level 
         elif action == "Tetris":
             self.score += 800 * self.level 
-
-        
-

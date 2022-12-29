@@ -4,7 +4,6 @@ from command import *
 from scoreboard import ScoreBoard
 from screen_play import Screen_play
 
-
 from pygame.font import *
 from pygame.sprite import *
 
@@ -32,6 +31,7 @@ def labels(score, WIDTH):
     level_score = score_label.render(str(score.level), True, (132, 202, 255))
     lines_score = score_label.render(str(score.lines), True, (132, 202, 255))
     next_piece_label = score_label.render("Next", True,(0,0,0))
+    lost_surface = score_label.render(str(score.lost), True, "Red")
     pygame.Surface.blit(screen, hold_surface, (10, 10))
     pygame.Surface.blit(screen, score_surface, (WIDTH * SCALE - 100, 10))
     pygame.Surface.blit(screen, text_score, (WIDTH * SCALE - 100, 25))
@@ -40,6 +40,7 @@ def labels(score, WIDTH):
     pygame.Surface.blit(screen, lines_surface, (WIDTH * SCALE - 100, 90))
     pygame.Surface.blit(screen, lines_score, (WIDTH * SCALE - 100, 105))
     pygame.Surface.blit(screen, next_piece_label, (WIDTH * SCALE - 100, 200))
+    pygame.Surface.blit(screen, lost_surface, (WIDTH * SCALE - 200, 250))
     return text_score
 
 def generate_falling_piece():
@@ -70,7 +71,6 @@ def validate_space(free_pos, falling_piece, ori):
     for pos in falling_piece:
         x,y = pos
         new_p = (x+x_dir, y+y_dir )
-       
         if new_p not in free_pos:
             return False
     
@@ -120,12 +120,11 @@ def validate_rotate_l(free_pos, piece, falling_piece):
         return False, new_l
     return True, new_l
 
-
-def set_grid(grid, fall_piece, color):
-    for val_pos in fall_piece:   
-        grid[val_pos] = color
-        
-    return grid
+def check_lost(falling_piece):
+    for x, y in falling_piece:
+        if y == 2: 
+            return True
+    return False
 
 def main():
     x_left = 80
@@ -140,7 +139,7 @@ def main():
     fall_speed = 0.29
     fall_time = 0
     level_time = 0
-     # trigger to change piece
+    # trigger to change piece
 
     screen_play = Screen_play(screen, x_left, x_right, y_top, y_bottom, SCALE)
     screen_sprite.add(screen_play)
@@ -155,19 +154,14 @@ def main():
     hold_piece = Piece(screen, SCALE, 2, 5)
     
     #dimensions grid 10x20
-
     screen_play.create_grid()
     change_piece = False
   
-
     while run:
-        #print(screen_play.grid)
-
         fall_time += clock.get_rawtime()
         level_time += clock.get_rawtime()
         clock.tick()
 
-    
         if level_time/1000 > 4:
             level_time = 0
             if fall_speed > 0.15:
@@ -180,12 +174,16 @@ def main():
                 if screen_play.grid[val] == "white":
                     free_pos.append(val)
             orientation_piece = (0, 1)
+
             if validate_space(free_pos, fall_piece.coord[fall_piece.piece], orientation_piece):
                 fall_piece.set_pos(orientation_piece) 
                 score.score += 1
             else:
                 change_piece = True
-            
+
+            if check_lost(fall_piece.coord[fall_piece.piece]):
+                score.lost = 'Game Over!'
+                run = 0        
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -219,30 +217,28 @@ def main():
                     if val_rot:
                         fall_piece.coord[fall_piece.piece] = pos
 
-        #screen_play.grid = set_grid(screen_play.grid, fall_piece.coord[fall_piece.piece], fall_piece.color_piece[fall_piece.piece])
-
         if change_piece:
             screen_play.set_grid(fall_piece.coord[fall_piece.piece], fall_piece.color_piece[fall_piece.piece])
             fall_piece.piece = next_piece.piece
             fall_piece.set_coord()
             next_piece = generate_next_piece()
-            change_piece = False
-
-            #change_piece = False
-
+            change_piece = False     
 
         screen.fill("white")   
         labels(score, WIDTH)
+     
         screen_play.fill()
         fall_piece.fill()
         next_piece.fill()
         screen_play.draw_grid()
-     
         falling_piece_sprite.update()
         next_piece_sprite.update()
         screen_sprite.update()
-        #pygame.display.flip()
+
         pygame.display.update()
+        if run == 0:
+            pygame.time.delay(1000)
+
 
 
 if __name__ == '__main__':  

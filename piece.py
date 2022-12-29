@@ -30,8 +30,6 @@ class Piece(pygame.sprite.Sprite):
         }
 
         
-
-
     def set_pos(self, vector):
         x, y = vector
         new_pos = []
