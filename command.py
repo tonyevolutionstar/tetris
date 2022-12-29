@@ -10,8 +10,6 @@ class InputHandler:
     """    
     def handleInput(self, event, image_ori, state, count): 
        
-           
-     
         if event.key == pygame.K_c:
             state = "hold"
             self.count = count

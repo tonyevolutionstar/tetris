@@ -15,14 +15,14 @@ class Screen_play(pygame.sprite.Sprite):
     def create_grid(self):
         for x in range(self.x_l, self.x_r, self.scale):
             for y in range(self.top, self.bottom, self.scale):
-                print("grid ", (int(x/10),int(y/10)))
+                #print("grid ", (int(x/10),int(y/10)))
                 self.grid[int(x/10), int(y/10)] = "white"
 
     def set_grid(self, pos, color):
         for val_pos in pos:   
             x,y = val_pos
             self.grid[val_pos] = color
-            print(val_pos, self.grid[val_pos])
+            #print(val_pos, self.grid[val_pos])
           
 
 

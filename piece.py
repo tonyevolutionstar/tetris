@@ -29,7 +29,6 @@ class Piece(pygame.sprite.Sprite):
             "Z": [(self.width, self.height), (self.width-1, self.height), (self.width+1, self.height+1), (self.width, self.height+1)]
         }
 
-   
 
     def set_pos(self, vector):
         x, y = vector
@@ -38,25 +37,6 @@ class Piece(pygame.sprite.Sprite):
             new_pos.append(((x_f + x), (y_f + y)))    
 
         self.coord[self.piece] = new_pos
-
-    def rotate(self):
-        #https://github.com/StanislavPetrovV/Python-Tetris/blob/master/main.py
-        
-        if self.piece != "R":
-            new_l = []
-            center = self.coord[self.piece][3] # middle
-            x_c, y_c = center  
-            for x, y in self.coord[self.piece]:
-                new_x = y - y_c
-                new_y = x - x_c
-                x = x_c - new_x
-                y = y_c + new_y
-                new_l.append((x,y))
-            self.coord[self.piece] = new_l 
-        else:
-
-            return 0
-        return 1
 
 
     def fill(self):
