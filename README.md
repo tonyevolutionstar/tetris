@@ -1,4 +1,4 @@
-#Tetris
+<h1>Tetris</h1>
 Project development TPJ 
 
 #Introduction
@@ -12,7 +12,7 @@ The grid was 10 rows for 20 columns
 The length of the piece is 4
 
 ##Possible Pieces
-<img src="pieces.jpg">
+<img src="./pieces.jpg">
 
 <ol> 
   <li>Z</li>
