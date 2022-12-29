@@ -29,6 +29,8 @@ class Piece(pygame.sprite.Sprite):
             "Z": [(self.width, self.height), (self.width-1, self.height), (self.width+1, self.height+1), (self.width, self.height+1)]
         }
 
+        
+
 
     def set_pos(self, vector):
         x, y = vector

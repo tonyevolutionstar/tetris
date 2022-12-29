@@ -1,4 +1,3 @@
-from tkinter import Grid
 import pygame 
 
 class Screen_play(pygame.sprite.Sprite):
@@ -11,26 +10,37 @@ class Screen_play(pygame.sprite.Sprite):
         self.display = display
         self.scale = scale
         self.grid = {}
+        self.free_pos = []
 
     def create_grid(self):
         for x in range(self.x_l, self.x_r, self.scale):
             for y in range(self.top, self.bottom, self.scale):
-                #print("grid ", (int(x/10),int(y/10)))
-                self.grid[int(x/10), int(y/10)] = "white"
+                if x >= 10 and y >= 10: 
+                    self.grid[int(x/10), int(y/10)] = "white"
+                else:
+                    self.grid[(x, y)] = "white"
+
+
+    def set_free_pos(self):
+        free_pos = []
+        for val in self.grid:
+            if self.grid[val] == "white":
+                print(val)
+                free_pos.append(val)
+        self.free_pos = free_pos
+
 
     def set_grid(self, pos, color):
         for val_pos in pos:   
-            x,y = val_pos
             self.grid[val_pos] = color
-            #print(val_pos, self.grid[val_pos])
           
-
 
     def draw_grid(self):
         for x in range(self.x_l, self.x_r, self.scale):
             for y in range(self.top, self.bottom, self.scale):
                 self.rect = pygame.Rect(x, y , self.scale, self.scale)
                 pygame.draw.rect(self.display, (223, 223, 223), self.rect, 1)
+
 
     def fill(self):
         for val in self.grid:

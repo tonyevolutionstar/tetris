@@ -44,46 +44,43 @@ def labels(score, WIDTH):
 
 def generate_falling_piece():
     fall_piece = Piece(screen, SCALE, int((WIDTH-5)/2), 2)
-    #fall_piece.piece = "1"
     fall_piece.choose_piece()
     fall_piece.set_coord()
+    fall_piece.coord[fall_piece.piece] = sorted(fall_piece.coord[fall_piece.piece], key = lambda x: x[0], reverse=False)
+
     return fall_piece 
 
 def generate_next_piece():
     next_p = Piece(screen, SCALE, WIDTH - 8, (HEIGHT/2) + 5)
     next_p.choose_piece()
     next_p.set_coord()
+    next_p.coord[next_p.piece] = sorted(next_p.coord[next_p.piece], key = lambda x: x[0], reverse=False)
+
     return next_p
 
-def validate_space(falling_piece, grid, ori):
+def validate_space(free_pos, falling_piece, ori):
     # verify if falling piece is free space when reaches bottom
     # falling piece is a list of the coordinates of the piece
     # grid already was free pos with white color
     x_dir, y_dir = ori
 
-    free_pos = []
-    for val in grid:
-        if grid[val] == "white":
-            free_pos.append(val)
+    if free_pos is None:
+        free_pos = []
 
     for pos in falling_piece:
         x,y = pos
-        new_p = (x + x_dir, y + y_dir)
+        new_p = (x+x_dir, y+y_dir )
+       
         if new_p not in free_pos:
-            if new_p[1] > 1:
-                return False
+            return False
     
     return True
 
-def validate_rotate(piece, falling_piece, grid):
+def validate_rotate(free_pos, piece, falling_piece):
     new_l = []
     if piece != "R":
         center = falling_piece[3] # middle
         x_c, y_c = center  
-        free_pos = []
-        for val in grid:
-            if grid[val] == "white":
-                free_pos.append(val)
 
         for pos in falling_piece:
             x,y = pos
@@ -101,16 +98,12 @@ def validate_rotate(piece, falling_piece, grid):
         return False, new_l
     return True, new_l
 
-def validate_rotate_l(piece, falling_piece, grid):
+def validate_rotate_l(free_pos, piece, falling_piece):
     new_l = []
     if piece != "R":
         center = falling_piece[3] # middle
         x_c, y_c = center  
-        free_pos = []
-        for val in grid:
-            if grid[val] == "white":
-                free_pos.append(val)
-
+  
         for pos in falling_piece:
             x,y = pos
             new_x = y - y_c
@@ -131,7 +124,7 @@ def validate_rotate_l(piece, falling_piece, grid):
 def set_grid(grid, fall_piece, color):
     for val_pos in fall_piece:   
         grid[val_pos] = color
-        print(val_pos, grid[val_pos])
+        
     return grid
 
 def main():
@@ -144,10 +137,10 @@ def main():
     orientation_piece = (0, 1)
     state = "soft"
     count = 1
-    fall_speed = 0.27
+    fall_speed = 0.29
     fall_time = 0
     level_time = 0
-    change_piece = False # trigger to change piece
+     # trigger to change piece
 
     screen_play = Screen_play(screen, x_left, x_right, y_top, y_bottom, SCALE)
     screen_sprite.add(screen_play)
@@ -164,11 +157,17 @@ def main():
     #dimensions grid 10x20
 
     screen_play.create_grid()
+    change_piece = False
+  
+
     while run:
+        #print(screen_play.grid)
+
         fall_time += clock.get_rawtime()
         level_time += clock.get_rawtime()
         clock.tick()
 
+    
         if level_time/1000 > 4:
             level_time = 0
             if fall_speed > 0.15:
@@ -176,10 +175,17 @@ def main():
 
         if fall_time/1000 >= fall_speed:
             fall_time = 0
+            free_pos = []
+            for val in screen_play.grid:
+                if screen_play.grid[val] == "white":
+                    free_pos.append(val)
             orientation_piece = (0, 1)
-            if validate_space(fall_piece.coord[fall_piece.piece], screen_play.grid, orientation_piece):
+            if validate_space(free_pos, fall_piece.coord[fall_piece.piece], orientation_piece):
                 fall_piece.set_pos(orientation_piece) 
                 score.score += 1
+            else:
+                change_piece = True
+            
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -191,48 +197,52 @@ def main():
                 
                 if event.key == pygame.K_LEFT:
                     orientation_piece = (-1, 0)
-                    if validate_space(fall_piece.coord[fall_piece.piece], screen_play.grid, orientation_piece):
+                    if validate_space(free_pos,fall_piece.coord[fall_piece.piece], orientation_piece):
                         fall_piece.set_pos(orientation_piece)  
                 elif event.key == pygame.K_RIGHT:
                     orientation_piece = (1, 0)
-                    if validate_space(fall_piece.coord[fall_piece.piece], screen_play.grid, orientation_piece):
+                    if validate_space(free_pos,fall_piece.coord[fall_piece.piece], orientation_piece):
                         fall_piece.set_pos(orientation_piece) 
                 elif event.key == pygame.K_DOWN:
                     state = "soft"
                     orientation_piece = (0, 1)
-                    if validate_space(fall_piece.coord[fall_piece.piece], screen_play.grid, orientation_piece):
+                    if validate_space(free_pos,fall_piece.coord[fall_piece.piece], orientation_piece):
                         fall_piece.set_pos(orientation_piece) 
                         score.score += 1
 
                 if event.key == pygame.K_z:# rotate left
-                    val_rot, pos = validate_rotate_l(fall_piece.piece, fall_piece.coord[fall_piece.piece], screen_play.grid)
+                    val_rot, pos = validate_rotate_l(free_pos, fall_piece.piece, fall_piece.coord[fall_piece.piece])
                     if val_rot:
                         fall_piece.coord[fall_piece.piece] = pos
                 elif event.key == pygame.K_UP: # rotate right
-                    val_rot, pos = validate_rotate(fall_piece.piece, fall_piece.coord[fall_piece.piece], screen_play.grid)
+                    val_rot, pos = validate_rotate(free_pos, fall_piece.piece, fall_piece.coord[fall_piece.piece])
                     if val_rot:
                         fall_piece.coord[fall_piece.piece] = pos
 
-        
+        #screen_play.grid = set_grid(screen_play.grid, fall_piece.coord[fall_piece.piece], fall_piece.color_piece[fall_piece.piece])
+
         if change_piece:
             screen_play.set_grid(fall_piece.coord[fall_piece.piece], fall_piece.color_piece[fall_piece.piece])
             fall_piece.piece = next_piece.piece
-            screen_play.fill()
+            fall_piece.set_coord()
             next_piece = generate_next_piece()
             change_piece = False
+
+            #change_piece = False
 
 
         screen.fill("white")   
         labels(score, WIDTH)
+        screen_play.fill()
         fall_piece.fill()
         next_piece.fill()
-        #screen_play.fill()
         screen_play.draw_grid()
-      
-        screen_sprite.update()
+     
         falling_piece_sprite.update()
         next_piece_sprite.update()
-        pygame.display.flip()
+        screen_sprite.update()
+        #pygame.display.flip()
+        pygame.display.update()
 
 
 if __name__ == '__main__':  
