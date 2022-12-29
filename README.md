@@ -25,5 +25,5 @@ For rotation i adapted the code from (line 122 - 125)
 https://github.com/StanislavPetrovV/Python-Tetris/blob/master/main.py
 
 <h1>Patterns</h1>
-<h2>Command</h2>
-<h2>Observer</h2>
+<p>Command</p>
+<p>Observer</p>
