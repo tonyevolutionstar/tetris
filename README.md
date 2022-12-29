@@ -15,15 +15,9 @@ The length of the piece is 4 <br>
 <img src="./pieces.png" width="250" height="250">
 
 
-<h1>Instructions</h1>
-<ul>
-  <li><strong>left arrow</strong>- move left</li>
-  <li><strong>right arrow</strong> - move right</li>
-  <li><strong>up arrow</strong> - rotate right</li>
-  <li><strong>z</strong> - rotate left</li>
-  <li><strong>space</strong> - hard drop</li>
-  <li><strong>c</strong> - hold </li>
-</ul>
+<h1>Commands</h1>
+<img src="./commands.png" width="250" height="150">
+from https://tetris.com/play-tetris/
 
 <h1>Code Explanation</h1>
 <h2>Rotation</h2>
@@ -31,3 +25,5 @@ For rotation i adapted the code from (line 122 - 125)
 https://github.com/StanislavPetrovV/Python-Tetris/blob/master/main.py
 
 <h1>Patterns</h1>
+<h2>Command</h2>
+<h2>Observer</h2>
