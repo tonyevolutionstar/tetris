@@ -1,5 +1,6 @@
 import pygame 
 
+
 class Screen_play(pygame.sprite.Sprite):
     def __init__(self, display, x_l, x_r, top, bottom, scale):
         pygame.sprite.Sprite.__init__(self)
@@ -29,6 +30,15 @@ class Screen_play(pygame.sprite.Sprite):
                 free_pos.append(val)
         self.free_pos = free_pos
 
+
+    def set_grid_rows(self, n_lines, verify_val):
+        #grid = self.grid
+        n = 1
+        for y in verify_val:
+            for x in verify_val[y]:
+                val_pos = (x,y)
+                self.grid[val_pos] = "white"
+                
 
     def set_grid(self, pos, color):
         for val_pos in pos:   

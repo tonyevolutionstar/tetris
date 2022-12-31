@@ -7,18 +7,4 @@ class ScoreBoard:
         self.action = None
         self.lost = ""
 
-    #state - soft, hard drop
-    def handle_score(self, action, state):
-        if state == "soft":
-            self.score += 1
-        elif state == "hard":
-            self.score += 2
-            
-        if action == "Single":
-            self.score += 100 * self.level
-        elif action == "Double":
-            self.score += 300 * self.level
-        elif action == "Triple":
-            self.score += 500 * self.level 
-        elif action == "Tetris":
-            self.score += 800 * self.level 
+

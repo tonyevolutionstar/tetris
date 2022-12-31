@@ -10,7 +10,7 @@ class Piece(pygame.sprite.Sprite):
         self.width = width # where in display piece is started
         self.height = height # where in display piece is started
         self.possible_pieces = ["1", "L", "J", "Z", "S", "T", "R"]
-        self.possible_colors = ["orange", "yellow", "purple", "blue", "red", "green", "brown"]
+        self.possible_colors = ["orange", (204,204,0), "purple", "blue", "red", (102, 204,0), "brown"]
         self.color_piece = dict(zip(self.possible_pieces, self.possible_colors))
         self.piece = ""
         self.coord = {}

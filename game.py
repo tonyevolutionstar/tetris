@@ -1,4 +1,7 @@
+from hashlib import new
+from turtle import clear
 import pygame 
+import collections
 from piece import Piece
 from command import *
 from scoreboard import ScoreBoard
@@ -6,6 +9,8 @@ from screen_play import Screen_play
 
 from pygame.font import *
 from pygame.sprite import *
+from collections import defaultdict
+
 
 pygame.init() # starts up pyGame
 
@@ -79,7 +84,7 @@ def validate_space(free_pos, falling_piece, ori):
 def validate_rotate(free_pos, piece, falling_piece):
     new_l = []
     if piece != "R":
-        center = falling_piece[3] # middle
+        center = falling_piece[2] # middle
         x_c, y_c = center  
 
         for pos in falling_piece:
@@ -98,10 +103,11 @@ def validate_rotate(free_pos, piece, falling_piece):
         return False, new_l
     return True, new_l
 
+
 def validate_rotate_l(free_pos, piece, falling_piece):
     new_l = []
     if piece != "R":
-        center = falling_piece[3] # middle
+        center = falling_piece[2] # middle
         x_c, y_c = center  
   
         for pos in falling_piece:
@@ -120,11 +126,77 @@ def validate_rotate_l(free_pos, piece, falling_piece):
         return False, new_l
     return True, new_l
 
+
 def check_lost(falling_piece):
     for x, y in falling_piece:
         if y == 2: 
             return True
     return False
+
+
+def clear_rows(x_left, x_right, grid):
+    # i need to create a dictionary to store all positions thats not white with y as key
+    # then i need to check if all lines are occupied
+
+    x_left = int(x_left/10)
+    x_right = int(x_right/10)
+ 
+    # add to a dictionary the values that are not white
+    verify_val = defaultdict(list)
+    for val in grid:
+        x, y = val
+        if (x,y) in grid:
+            if grid[(x,y)] != "white":
+                verify_val[y].append(x)
+
+    # list of rows
+    compare_l = [x for x in range(x_left, x_right, 1)] 
+    compare_l.sort()
+    lines = 0
+   
+
+    #print(verify_val)
+    positions = []
+
+    for y in verify_val:
+        verify_val[y].sort()
+        #compare if rows are full 
+        if verify_val[y] == compare_l: # it was the rows
+            lines += 1
+            #handle_score(score.level, lines, score.score)
+
+            for x in verify_val[y]:
+                positions.append((x,y))
+            
+
+    #sorted(new_dict.keys(), reverse=True)
+    # (17, 20) , (18, 20)
+    for remove in grid:
+        x, y = remove
+        for val in positions:
+            x_v, y_v = val
+            if y < y_v:
+                pass
+                #move lines above down
+
+    return lines, grid
+
+
+def handle_score(level, lines, score):
+    if lines == 1:
+        score += 100 * level
+        
+    elif lines == 2:
+        score += 300 * level
+    elif lines == 3:
+        score += 500 * level    
+    elif lines == 4:
+        score += 800 * level 
+    
+    lines = 0
+
+    return score
+
 
 def main():
     x_left = 80
@@ -143,7 +215,6 @@ def main():
 
     screen_play = Screen_play(screen, x_left, x_right, y_top, y_bottom, SCALE)
     screen_sprite.add(screen_play)
-   
     score = ScoreBoard()
 
     #pieces
@@ -156,7 +227,15 @@ def main():
     #dimensions grid 10x20
     screen_play.create_grid()
     change_piece = False
-  
+    
+    free_pos = []
+    for val in screen_play.grid:
+        if screen_play.grid[val] == "white":
+            free_pos.append(val)
+
+    lines = 0
+    
+
     while run:
         fall_time += clock.get_rawtime()
         level_time += clock.get_rawtime()
@@ -172,12 +251,18 @@ def main():
             free_pos = []
             for val in screen_play.grid:
                 if screen_play.grid[val] == "white":
-                    free_pos.append(val)
+                    free_pos.append(val)    
+           
             orientation_piece = (0, 1)
+            lines, screen_play.grid = clear_rows(x_left, x_right,  screen_play.grid)
+
 
             if validate_space(free_pos, fall_piece.coord[fall_piece.piece], orientation_piece):
                 fall_piece.set_pos(orientation_piece) 
                 score.score += 1
+                score.score = handle_score(score.level, lines, score.score)
+                
+
             else:
                 change_piece = True
 
@@ -185,6 +270,18 @@ def main():
                 score.lost = 'Game Over!'
                 run = 0        
             
+
+        #print(lines)
+    
+        
+  
+        #print(sorted(screen_play.grid.keys(), reverse=True))
+        #print(clear_test(screen_play.grid))
+        #score.set_score(lines)
+
+        #if flag == 1:
+        #    screen_play.set_grid_rows(lines, verify_val)    
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit() #shuts down pyGame
@@ -224,9 +321,10 @@ def main():
             next_piece = generate_next_piece()
             change_piece = False     
 
-        screen.fill("white")   
+        screen.fill("white")  
+ 
         labels(score, WIDTH)
-     
+
         screen_play.fill()
         fall_piece.fill()
         next_piece.fill()
