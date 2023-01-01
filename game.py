@@ -53,7 +53,6 @@ def generate_falling_piece():
     fall_piece.choose_piece()
     fall_piece.set_coord()
     fall_piece.coord[fall_piece.piece] = sorted(fall_piece.coord[fall_piece.piece], key = lambda x: x[0], reverse=False)
-
     return fall_piece 
 
 def generate_next_piece():
@@ -61,8 +60,8 @@ def generate_next_piece():
     next_p.choose_piece()
     next_p.set_coord()
     next_p.coord[next_p.piece] = sorted(next_p.coord[next_p.piece], key = lambda x: x[0], reverse=False)
-
     return next_p
+
 
 def validate_space(free_pos, falling_piece, ori):
     # verify if falling piece is free space when reaches bottom
@@ -80,6 +79,7 @@ def validate_space(free_pos, falling_piece, ori):
             return False
     
     return True
+
 
 def validate_rotate(free_pos, piece, falling_piece):
     new_l = []
@@ -134,7 +134,7 @@ def check_lost(falling_piece):
     return False
 
 
-def clear_rows(x_left, x_right, grid):
+def clear_rows(x_left, x_right, grid, new_g):
     # i need to create a dictionary to store all positions thats not white with y as key
     # then i need to check if all lines are occupied
 
@@ -154,32 +154,37 @@ def clear_rows(x_left, x_right, grid):
     compare_l.sort()
     lines = 0
    
-
-    #print(verify_val)
-    positions = []
+    pos = []
+    change = False
 
     for y in verify_val:
         verify_val[y].sort()
         #compare if rows are full 
-        if verify_val[y] == compare_l: # it was the rows
+        if verify_val[y] == compare_l: # it was the rows, full
             lines += 1
-            #handle_score(score.level, lines, score.score)
-
             for x in verify_val[y]:
-                positions.append((x,y))
-            
+                pos.append((x,y))
+            change = True
+           
+    #grid_v = [["white" for x in range()]]
 
-    #sorted(new_dict.keys(), reverse=True)
-    # (17, 20) , (18, 20)
-    for remove in grid:
-        x, y = remove
-        for val in positions:
-            x_v, y_v = val
-            if y < y_v:
-                pass
-                #move lines above down
+    inc = 0
+    row_index = 20
+    while row_index > -1:
+        clear = True
+        for val in grid:
+            if grid[val] == "white":
+                clear = False
+                break
+        if clear:
+            inc += 1
+            del grid[val] 
 
-    return lines, grid
+ 
+
+    
+
+    return lines, new_g
 
 
 def handle_score(level, lines, score):
@@ -226,6 +231,8 @@ def main():
     
     #dimensions grid 10x20
     screen_play.create_grid()
+    create_grid = screen_play.create_grid()
+    #print(create_grid)
     change_piece = False
     
     free_pos = []
@@ -233,8 +240,7 @@ def main():
         if screen_play.grid[val] == "white":
             free_pos.append(val)
 
-    lines = 0
-    
+
 
     while run:
         fall_time += clock.get_rawtime()
@@ -254,15 +260,14 @@ def main():
                     free_pos.append(val)    
            
             orientation_piece = (0, 1)
-            lines, screen_play.grid = clear_rows(x_left, x_right,  screen_play.grid)
-
+            score.lines, screen_play.grid = clear_rows(x_left, x_right,  screen_play.grid, create_grid)
+            
 
             if validate_space(free_pos, fall_piece.coord[fall_piece.piece], orientation_piece):
                 fall_piece.set_pos(orientation_piece) 
                 score.score += 1
-                score.score = handle_score(score.level, lines, score.score)
-                
-
+                score.score = handle_score(score.level, score.lines, score.score)
+            
             else:
                 change_piece = True
 
@@ -272,7 +277,7 @@ def main():
             
 
         #print(lines)
-    
+        
         
   
         #print(sorted(screen_play.grid.keys(), reverse=True))

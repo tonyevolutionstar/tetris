@@ -16,10 +16,12 @@ class Screen_play(pygame.sprite.Sprite):
     def create_grid(self):
         for x in range(self.x_l, self.x_r, self.scale):
             for y in range(self.top, self.bottom, self.scale):
+                #print(x, y)
                 if x >= 10 and y >= 10: 
                     self.grid[int(x/10), int(y/10)] = "white"
                 else:
                     self.grid[(x, y)] = "white"
+        return self.grid
 
 
     def set_free_pos(self):
