@@ -10,7 +10,6 @@ class Screen_play(pygame.sprite.Sprite):
         self.display = display
         self.scale = scale
         self.grid = {}
-        self.free_pos = []
 
     def create_grid(self):
         for x in range(self.x_l, self.x_r, self.scale):

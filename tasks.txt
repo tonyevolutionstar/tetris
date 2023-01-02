@@ -2,8 +2,8 @@
 2. implementar hold 
 3. implementar next - done 
 4. implementar hard drop - cair até ao fundo
-5. implementar score +=
+5. implementar score += - done
 6. criar conjunto de peças que estejam na grelha em abaixo - conjunto de peças sprites - done
-7. limpar linhas se tiverem cheias 
+7. limpar linhas se tiverem cheias - done
 8. implementar linhas e nivel
 9. game over - done 

@@ -24,7 +24,7 @@ falling_piece_sprite = pygame.sprite.Group()
 next_piece_sprite = pygame.sprite.Group()
 
 
-def labels(score, WIDTH):
+def labels(score, WIDTH, action):
     score_surface = score_label.render("Score", True, (0,0,0))
     level_surface = score_label.render("Level", True, (0,0,0))
     lines_surface = score_label.render("Lines", True, (0,0,0))
@@ -34,6 +34,7 @@ def labels(score, WIDTH):
     lines_score = score_label.render(str(score.lines), True, (132, 202, 255))
     next_piece_label = score_label.render("Next", True,(0,0,0))
     lost_surface = score_label.render(str(score.lost), True, "Red")
+    action_surface = score_label.render(action, True, "Green")
     pygame.Surface.blit(screen, hold_surface, (10, 10))
     pygame.Surface.blit(screen, score_surface, (WIDTH * SCALE - 100, 10))
     pygame.Surface.blit(screen, text_score, (WIDTH * SCALE - 100, 25))
@@ -43,6 +44,7 @@ def labels(score, WIDTH):
     pygame.Surface.blit(screen, lines_score, (WIDTH * SCALE - 100, 105))
     pygame.Surface.blit(screen, next_piece_label, (WIDTH * SCALE - 100, 200))
     pygame.Surface.blit(screen, lost_surface, (WIDTH * SCALE - 200, 250))
+    pygame.Surface.blit(screen, action_surface, (WIDTH * SCALE - 200, 250))
     return text_score
 
 def generate_falling_piece():
@@ -134,7 +136,6 @@ def check_lost(falling_piece):
 def clear_rows(x_left, x_right, top, bottom, grid, new_g):
     # i need to create a dictionary to store all positions thats not white with y as key
     # then i need to check if all lines are occupied
-
     x_left = int(x_left/10)
     x_right = int(x_right/10)
     top = int(top/10)
@@ -171,20 +172,20 @@ def clear_rows(x_left, x_right, top, bottom, grid, new_g):
             if y-1 > 1:
                 new_g[(x, y)] = grid[(x,y-1)]
         
-    return lines, new_g
+        return lines, new_g
+    return 0, grid
 
 
 def handle_score(level, lines, score):
-    if lines == 1:
-        score += 100 * level
-    elif lines == 2:
-        score += 300 * level
-    elif lines == 3:
-        score += 500 * level    
-    elif lines == 4:
-        score += 800 * level 
-
-    return score
+    action = ""
+    
+    if lines != 0:
+        print(lines)
+        lines_dict = {1: "Single", 2: "Double", 3: "Triple", 4: "Tetris"}
+        score_dict = {1: 100 * level, 2: 300*level, 3: 500 * level, 4: 800 * level}
+        return score+score_dict[lines], lines_dict[lines]
+    else:
+        return score, ""
 
 
 def main():
@@ -222,6 +223,8 @@ def main():
         if screen_play.grid[val] == "white":
             free_pos.append(val)
 
+    action = ""
+
     while run:
         fall_time += clock.get_rawtime()
         level_time += clock.get_rawtime()
@@ -240,12 +243,12 @@ def main():
                     free_pos.append(val)    
            
             orientation_piece = (0, 1)
-            score.lines, screen_play.grid = clear_rows(x_left, x_right, y_top, y_bottom, screen_play.grid, create_grid)
-
+            lines, screen_play.grid = clear_rows(x_left, x_right, y_top, y_bottom, screen_play.grid, create_grid)
+            score.lines += lines
             if validate_space(free_pos, fall_piece.coord[fall_piece.piece], orientation_piece):
                 fall_piece.set_pos(orientation_piece) 
                 score.score += 1
-                score.score = handle_score(score.level, score.lines, score.score)
+                score.score, action = handle_score(score.level, lines, score.score)
             else:
                 change_piece = True
 
@@ -294,7 +297,7 @@ def main():
 
         screen.fill("white")  
  
-        labels(score, WIDTH)
+        labels(score, WIDTH, action)
 
         screen_play.fill()
         fall_piece.fill()
