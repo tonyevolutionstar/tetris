@@ -1,7 +1,4 @@
-from hashlib import new
-from turtle import clear
 import pygame 
-import collections
 from piece import Piece
 from command import *
 from scoreboard import ScoreBoard
@@ -134,12 +131,14 @@ def check_lost(falling_piece):
     return False
 
 
-def clear_rows(x_left, x_right, grid, new_g):
+def clear_rows(x_left, x_right, top, bottom, grid, new_g):
     # i need to create a dictionary to store all positions thats not white with y as key
     # then i need to check if all lines are occupied
 
     x_left = int(x_left/10)
     x_right = int(x_right/10)
+    top = int(top/10)
+    bottom = int(bottom/10)
  
     # add to a dictionary the values that are not white
     verify_val = defaultdict(list)
@@ -154,51 +153,36 @@ def clear_rows(x_left, x_right, grid, new_g):
     compare_l.sort()
     lines = 0
    
-    pos = []
     change = False
-
+    positions_full = []
     for y in verify_val:
         verify_val[y].sort()
         #compare if rows are full 
         if verify_val[y] == compare_l: # it was the rows, full
             lines += 1
             for x in verify_val[y]:
-                pos.append((x,y))
+                positions_full.append((x,y))
             change = True
-           
-    #grid_v = [["white" for x in range()]]
-
-    inc = 0
-    row_index = 20
-    while row_index > -1:
-        clear = True
-        for val in grid:
-            if grid[val] == "white":
-                clear = False
-                break
-        if clear:
-            inc += 1
-            del grid[val] 
-
- 
-
     
-
+    if change:
+        new_g = grid # copy all positions
+        
+        for x, y in sorted(new_g,reverse=True):
+            if y-1 > 1:
+                new_g[(x, y)] = grid[(x,y-1)]
+        
     return lines, new_g
 
 
 def handle_score(level, lines, score):
     if lines == 1:
         score += 100 * level
-        
     elif lines == 2:
         score += 300 * level
     elif lines == 3:
         score += 500 * level    
     elif lines == 4:
         score += 800 * level 
-    
-    lines = 0
 
     return score
 
@@ -212,16 +196,15 @@ def main():
     run = 1
     orientation_piece = (0, 1)
     state = "soft"
-    count = 1
+    count = 1 # hold
     fall_speed = 0.29
     fall_time = 0
     level_time = 0
-    # trigger to change piece
 
     screen_play = Screen_play(screen, x_left, x_right, y_top, y_bottom, SCALE)
     screen_sprite.add(screen_play)
     score = ScoreBoard()
-
+    
     #pieces
     fall_piece = generate_falling_piece()
     falling_piece_sprite.add(fall_piece)
@@ -232,15 +215,12 @@ def main():
     #dimensions grid 10x20
     screen_play.create_grid()
     create_grid = screen_play.create_grid()
-    #print(create_grid)
     change_piece = False
     
     free_pos = []
     for val in screen_play.grid:
         if screen_play.grid[val] == "white":
             free_pos.append(val)
-
-
 
     while run:
         fall_time += clock.get_rawtime()
@@ -260,14 +240,12 @@ def main():
                     free_pos.append(val)    
            
             orientation_piece = (0, 1)
-            score.lines, screen_play.grid = clear_rows(x_left, x_right,  screen_play.grid, create_grid)
-            
+            score.lines, screen_play.grid = clear_rows(x_left, x_right, y_top, y_bottom, screen_play.grid, create_grid)
 
             if validate_space(free_pos, fall_piece.coord[fall_piece.piece], orientation_piece):
                 fall_piece.set_pos(orientation_piece) 
                 score.score += 1
                 score.score = handle_score(score.level, score.lines, score.score)
-            
             else:
                 change_piece = True
 
@@ -275,18 +253,6 @@ def main():
                 score.lost = 'Game Over!'
                 run = 0        
             
-
-        #print(lines)
-        
-        
-  
-        #print(sorted(screen_play.grid.keys(), reverse=True))
-        #print(clear_test(screen_play.grid))
-        #score.set_score(lines)
-
-        #if flag == 1:
-        #    screen_play.set_grid_rows(lines, verify_val)    
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit() #shuts down pyGame
@@ -341,8 +307,6 @@ def main():
         pygame.display.update()
         if run == 0:
             pygame.time.delay(1000)
-
-
 
 if __name__ == '__main__':  
     main()

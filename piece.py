@@ -43,6 +43,4 @@ class Piece(pygame.sprite.Sprite):
         for x,y in self.coord[self.piece]:
             self.rect = pygame.Rect(x*self.scale, y*self.scale, self.scale, self.scale)
             pygame.draw.rect(self.display, self.color_piece[self.piece], self.rect)
-    
-
-    
+  
