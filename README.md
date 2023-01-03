@@ -7,8 +7,8 @@ I chose Tetris, because I had an interest in knowing how it worked since I playe
 
 <h1>How tetris works</h1>
 The purpose of the game is to move pieces, that decends onto the playing field, until a line is clear, that means all squares of the grid are fill with color. <br>
-The game ends when there is no space on grid to play. Just like example below. <br>
-<img src = "./gameover.png" width="250" height="250">
+The game ends when there is no space on grid to play. Just like the example below. <br>
+<img src = "./gameover.png" width="250" height="350">
 
 <h2>Possible Pieces</h2>
 Tetris has 7 possible pieces and the pieces are: (the colors in this image are similar to the program)
