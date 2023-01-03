@@ -1,4 +1,11 @@
 import pygame 
+import logging
+import os
+
+if os.path.exists("logger.log"):
+    os.remove("logger.log")
+logging.basicConfig(filename='logger.log', encoding='utf-8', level=logging.DEBUG)
+
 from piece import Piece
 from screen_play import Screen_play
 
@@ -45,6 +52,7 @@ def generate_falling_piece():
     fall_piece.choose_piece()
     fall_piece.set_coord()
     fall_piece.coord[fall_piece.piece] = sorted(fall_piece.coord[fall_piece.piece], key = lambda x: x[0], reverse=False)
+    logging.info("Generate new fall piece - " + fall_piece.piece)
     return fall_piece 
 
 def generate_next_piece():
@@ -52,6 +60,7 @@ def generate_next_piece():
     next_p.choose_piece()
     next_p.set_coord()
     next_p.coord[next_p.piece] = sorted(next_p.coord[next_p.piece], key = lambda x: x[0], reverse=False)
+    logging.info("Generate next piece - " + next_p.piece)
     return next_p
 
 
@@ -119,10 +128,21 @@ def validate_rotate_l(free_pos, piece, falling_piece):
     return True, new_l
 
 
-def check_lost(falling_piece):
-    for x, y in falling_piece:
-        if y == 2: 
-            return True
+def check_lost(grid, top, bottom):
+    top = int(top/10)
+    bottom = int(bottom/10)
+    compare_l = [x for x in range(top, bottom, 1)] 
+    compare_l.sort()
+
+    y_pos = set()
+
+    for x, y in grid:
+        if grid[(x,y)] != "white":
+            y_pos.add(y)
+    
+    if sorted(y_pos) == compare_l:
+        return True
+
     return False
 
 
@@ -166,7 +186,6 @@ def clear_rows(x_left, x_right, grid, new_g):
 
 def handle_score(lines, score):
     if lines != 0:
-        print(lines)
         lines_dict = {1: "Single", 2: "Double", 3: "Triple", 4: "Tetris"}
         score_dict = {1: 100, 2: 300, 3: 500, 4: 800}
         return score+score_dict[lines], lines_dict[lines]
@@ -174,6 +193,7 @@ def handle_score(lines, score):
         return score, ""
 
 def set_free_pos(grid):
+    logging.info("Creating a list with free positions of white cells")
     free_pos = []
     for val in grid:
         if grid[val] == "white":
@@ -227,49 +247,77 @@ def main():
             free_pos = set_free_pos(screen_play.grid) 
            
             orientation_piece = (0, 1)
+            logging.info("Dropping piece")
             lines, screen_play.grid = clear_rows(x_left, x_right, screen_play.grid, create_grid)
             score_lines += lines
             if validate_space(free_pos, fall_piece.coord[fall_piece.piece], orientation_piece):
                 fall_piece.set_pos(orientation_piece) 
                 score += 1
                 score, action = handle_score(lines, score)
+                if action != "":
+                    logging.info("Action " + action)
+                    logging.info("Score updated to " + str(score))
             else:
                 change_piece = True
+                logging.info("Changing piece")
 
-            if check_lost(fall_piece.coord[fall_piece.piece]):
+            if check_lost(screen_play.grid, y_top, y_bottom):
                 lost = 'Game Over!'
+                logging.error(lost)
                 run = 0        
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit() #shuts down pyGame
+                logging.info("Exit Application")
                 run = 0
             elif event.type == pygame.KEYDOWN:
-             
                 if event.key == pygame.K_LEFT:
+                    logging.info("Left key pressed")
                     orientation_piece = (-1, 0)
                     if validate_space(free_pos,fall_piece.coord[fall_piece.piece], orientation_piece):
                         fall_piece.set_pos(orientation_piece)  
+                        logging.info("Left movement is possible")
+                    else:
+                        logging.error("Invalid space")
                 elif event.key == pygame.K_RIGHT:
+                    logging.info("Right key pressed")
                     orientation_piece = (1, 0)
                     if validate_space(free_pos,fall_piece.coord[fall_piece.piece], orientation_piece):
                         fall_piece.set_pos(orientation_piece) 
+                        logging.info("Right movement is possible")
+                    else:
+                        logging.error("Invalid space")
                 elif event.key == pygame.K_DOWN:
+                    logging.info("Down key pressed")
                     orientation_piece = (0, 1)
                     if validate_space(free_pos,fall_piece.coord[fall_piece.piece], orientation_piece):
                         fall_piece.set_pos(orientation_piece) 
+                        logging.info("Down movement is possible") 
                         score += 1
+                        logging.info("Score updated to " + str(score))
+                    else:
+                        logging.error("Invalid space")
                 elif event.key == pygame.K_z:# rotate left
+                    logging.info("Z key pressed")
                     val_rot, pos = validate_rotate_l(free_pos, fall_piece.piece, fall_piece.coord[fall_piece.piece])
                     if val_rot:
+                        logging.info("Rotation to left is possible")
                         fall_piece.coord[fall_piece.piece] = pos
+                    else:
+                        logging.error("Invalid space")
                 elif event.key == pygame.K_UP: # rotate right
                     val_rot, pos = validate_rotate(free_pos, fall_piece.piece, fall_piece.coord[fall_piece.piece])
+                    logging.info("Up key pressed")
                     if val_rot:
+                        logging.info("Rotation to right is possible")
                         fall_piece.coord[fall_piece.piece] = pos
+                    else:
+                        logging.error("Invalid space")
                 else:
                     #ignore other keys pressed
                     orientation_piece = (0,0)
+                    logging.error("Invalid Key pressed. Valid ones up, left, down, up, z")
 
         if change_piece:
             screen_play.set_grid(fall_piece.coord[fall_piece.piece], fall_piece.color_piece[fall_piece.piece])
@@ -290,6 +338,7 @@ def main():
         screen_sprite.update()
         pygame.display.update()
         if run == 0:
+            logging.info("Exit Application")
             pygame.time.delay(1000)
 
 
