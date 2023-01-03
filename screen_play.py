@@ -23,7 +23,6 @@ class Screen_play(pygame.sprite.Sprite):
         for val_pos in pos:  
             self.grid[val_pos] = color
 
-
     def draw_grid(self):
         for x in range(self.x_l, self.x_r, self.scale):
             for y in range(self.top, self.bottom, self.scale):

@@ -1,7 +1,5 @@
 import pygame 
 from piece import Piece
-from command import *
-from scoreboard import ScoreBoard
 from screen_play import Screen_play
 
 from pygame.font import *
@@ -24,28 +22,23 @@ falling_piece_sprite = pygame.sprite.Group()
 next_piece_sprite = pygame.sprite.Group()
 
 
-def labels(score, WIDTH, action):
+def labels(score, score_lines, lost, WIDTH, action):
     score_surface = score_label.render("Score", True, (0,0,0))
-    level_surface = score_label.render("Level", True, (0,0,0))
     lines_surface = score_label.render("Lines", True, (0,0,0))
-    hold_surface = score_label.render("Hold", True, (0,0,0))
-    text_score = score_label.render(str(score.score), True, (132, 202, 255))
-    level_score = score_label.render(str(score.level), True, (132, 202, 255))
-    lines_score = score_label.render(str(score.lines), True, (132, 202, 255))
+    text_score = score_label.render(str(score), True, (132, 202, 255))
+    lines_score = score_label.render(str(score_lines), True, (132, 202, 255))
     next_piece_label = score_label.render("Next", True,(0,0,0))
-    lost_surface = score_label.render(str(score.lost), True, "Red")
+    lost_surface = score_label.render(lost, True, "Red")
     action_surface = score_label.render(action, True, "Green")
-    pygame.Surface.blit(screen, hold_surface, (10, 10))
-    pygame.Surface.blit(screen, score_surface, (WIDTH * SCALE - 100, 10))
-    pygame.Surface.blit(screen, text_score, (WIDTH * SCALE - 100, 25))
-    pygame.Surface.blit(screen, level_surface, (WIDTH * SCALE - 100, 50))
-    pygame.Surface.blit(screen, level_score, (WIDTH * SCALE - 100, 65))
-    pygame.Surface.blit(screen, lines_surface, (WIDTH * SCALE - 100, 90))
-    pygame.Surface.blit(screen, lines_score, (WIDTH * SCALE - 100, 105))
-    pygame.Surface.blit(screen, next_piece_label, (WIDTH * SCALE - 100, 200))
+    pygame.Surface.blit(screen, score_surface, (WIDTH * SCALE - 100, 20))
+    pygame.Surface.blit(screen, text_score, (WIDTH * SCALE - 100, 35))
+    pygame.Surface.blit(screen, lines_surface, (WIDTH * SCALE - 100, 60))
+    pygame.Surface.blit(screen, lines_score, (WIDTH * SCALE - 100, 75))
+    pygame.Surface.blit(screen, next_piece_label, (WIDTH * SCALE - 100, 150))
     pygame.Surface.blit(screen, lost_surface, (WIDTH * SCALE - 200, 250))
     pygame.Surface.blit(screen, action_surface, (WIDTH * SCALE - 200, 250))
     return text_score
+
 
 def generate_falling_piece():
     fall_piece = Piece(screen, SCALE, int((WIDTH-5)/2), 2)
@@ -55,7 +48,7 @@ def generate_falling_piece():
     return fall_piece 
 
 def generate_next_piece():
-    next_p = Piece(screen, SCALE, WIDTH - 8, (HEIGHT/2) + 5)
+    next_p = Piece(screen, SCALE, WIDTH - 8, (HEIGHT/3)+ 5)
     next_p.choose_piece()
     next_p.set_coord()
     next_p.coord[next_p.piece] = sorted(next_p.coord[next_p.piece], key = lambda x: x[0], reverse=False)
@@ -133,14 +126,12 @@ def check_lost(falling_piece):
     return False
 
 
-def clear_rows(x_left, x_right, top, bottom, grid, new_g):
+def clear_rows(x_left, x_right, grid, new_g):
     # i need to create a dictionary to store all positions thats not white with y as key
     # then i need to check if all lines are occupied
     x_left = int(x_left/10)
     x_right = int(x_right/10)
-    top = int(top/10)
-    bottom = int(bottom/10)
- 
+  
     # add to a dictionary the values that are not white
     verify_val = defaultdict(list)
     for val in grid:
@@ -164,7 +155,7 @@ def clear_rows(x_left, x_right, top, bottom, grid, new_g):
     
     if change:
         new_g = grid # copy all positions
-        
+        #loop backwars to get previous positions
         for x, y in sorted(new_g,reverse=True):
             if y-1 > 1:
                 new_g[(x, y)] = grid[(x,y-1)]
@@ -173,17 +164,27 @@ def clear_rows(x_left, x_right, top, bottom, grid, new_g):
     return 0, grid
 
 
-def handle_score(level, lines, score):
+def handle_score(lines, score):
     if lines != 0:
         print(lines)
         lines_dict = {1: "Single", 2: "Double", 3: "Triple", 4: "Tetris"}
-        score_dict = {1: 100 * level, 2: 300*level, 3: 500 * level, 4: 800 * level}
+        score_dict = {1: 100, 2: 300, 3: 500, 4: 800}
         return score+score_dict[lines], lines_dict[lines]
     else:
         return score, ""
 
+def set_free_pos(grid):
+    free_pos = []
+    for val in grid:
+        if grid[val] == "white":
+            free_pos.append(val)
+    return free_pos
+
 
 def main():
+    score = 0
+    score_lines = 0
+    lost = ""
     x_left = 80
     x_right = 180 
     y_top = 20
@@ -191,34 +192,25 @@ def main():
 
     run = 1
     orientation_piece = (0, 1)
-    state = "soft"
-    count = 1 # hold
     fall_speed = 0.29
     fall_time = 0
     level_time = 0
 
     screen_play = Screen_play(screen, x_left, x_right, y_top, y_bottom, SCALE)
     screen_sprite.add(screen_play)
-    score = ScoreBoard()
-    
+        
     #pieces
     fall_piece = generate_falling_piece()
     falling_piece_sprite.add(fall_piece)
     next_piece = generate_next_piece()
     next_piece_sprite.add(next_piece)
-    hold_piece = Piece(screen, SCALE, 2, 5)
     
     #dimensions grid 10x20
     screen_play.create_grid()
     create_grid = screen_play.create_grid()
     change_piece = False
-    
-    free_pos = []
-    for val in screen_play.grid:
-        if screen_play.grid[val] == "white":
-            free_pos.append(val)
-
-    action = ""
+    free_pos = set_free_pos(screen_play.grid)
+    action = "" # info about clear rows
 
     while run:
         fall_time += clock.get_rawtime()
@@ -232,23 +224,20 @@ def main():
 
         if fall_time/1000 >= fall_speed:
             fall_time = 0
-            free_pos = []
-            for val in screen_play.grid:
-                if screen_play.grid[val] == "white":
-                    free_pos.append(val)    
+            free_pos = set_free_pos(screen_play.grid) 
            
             orientation_piece = (0, 1)
-            lines, screen_play.grid = clear_rows(x_left, x_right, y_top, y_bottom, screen_play.grid, create_grid)
-            score.lines += lines
+            lines, screen_play.grid = clear_rows(x_left, x_right, screen_play.grid, create_grid)
+            score_lines += lines
             if validate_space(free_pos, fall_piece.coord[fall_piece.piece], orientation_piece):
                 fall_piece.set_pos(orientation_piece) 
-                score.score += 1
-                score.score, action = handle_score(score.level, lines, score.score)
+                score += 1
+                score, action = handle_score(lines, score)
             else:
                 change_piece = True
 
             if check_lost(fall_piece.coord[fall_piece.piece]):
-                score.lost = 'Game Over!'
+                lost = 'Game Over!'
                 run = 0        
             
         for event in pygame.event.get():
@@ -256,9 +245,7 @@ def main():
                 pygame.quit() #shuts down pyGame
                 run = 0
             elif event.type == pygame.KEYDOWN:
-                i = InputHandler()    
-                orientation_piece, state, count = i.handleInput(event, orientation_piece, state, count)               
-                
+             
                 if event.key == pygame.K_LEFT:
                     orientation_piece = (-1, 0)
                     if validate_space(free_pos,fall_piece.coord[fall_piece.piece], orientation_piece):
@@ -268,13 +255,11 @@ def main():
                     if validate_space(free_pos,fall_piece.coord[fall_piece.piece], orientation_piece):
                         fall_piece.set_pos(orientation_piece) 
                 elif event.key == pygame.K_DOWN:
-                    state = "soft"
                     orientation_piece = (0, 1)
                     if validate_space(free_pos,fall_piece.coord[fall_piece.piece], orientation_piece):
                         fall_piece.set_pos(orientation_piece) 
-                        score.score += 1
-
-                if event.key == pygame.K_z:# rotate left
+                        score += 1
+                elif event.key == pygame.K_z:# rotate left
                     val_rot, pos = validate_rotate_l(free_pos, fall_piece.piece, fall_piece.coord[fall_piece.piece])
                     if val_rot:
                         fall_piece.coord[fall_piece.piece] = pos
@@ -282,6 +267,9 @@ def main():
                     val_rot, pos = validate_rotate(free_pos, fall_piece.piece, fall_piece.coord[fall_piece.piece])
                     if val_rot:
                         fall_piece.coord[fall_piece.piece] = pos
+                else:
+                    #ignore other keys pressed
+                    orientation_piece = (0,0)
 
         if change_piece:
             screen_play.set_grid(fall_piece.coord[fall_piece.piece], fall_piece.color_piece[fall_piece.piece])
@@ -291,8 +279,7 @@ def main():
             change_piece = False     
 
         screen.fill("white")  
- 
-        labels(score, WIDTH, action)
+        labels(score, score_lines, lost, WIDTH, action)
 
         screen_play.fill()
         fall_piece.fill()
@@ -301,10 +288,10 @@ def main():
         falling_piece_sprite.update()
         next_piece_sprite.update()
         screen_sprite.update()
-
         pygame.display.update()
         if run == 0:
             pygame.time.delay(1000)
+
 
 if __name__ == '__main__':  
     main()
