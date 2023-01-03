@@ -155,14 +155,11 @@ def clear_rows(x_left, x_right, top, bottom, grid, new_g):
     lines = 0
    
     change = False
-    positions_full = []
     for y in verify_val:
         verify_val[y].sort()
         #compare if rows are full 
         if verify_val[y] == compare_l: # it was the rows, full
             lines += 1
-            for x in verify_val[y]:
-                positions_full.append((x,y))
             change = True
     
     if change:
@@ -177,8 +174,6 @@ def clear_rows(x_left, x_right, top, bottom, grid, new_g):
 
 
 def handle_score(level, lines, score):
-    action = ""
-    
     if lines != 0:
         print(lines)
         lines_dict = {1: "Single", 2: "Double", 3: "Triple", 4: "Tetris"}
