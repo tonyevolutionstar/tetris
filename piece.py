@@ -38,6 +38,9 @@ class Piece(pygame.sprite.Sprite):
 
         self.coord[self.piece] = new_pos
 
+    def set_coord_rotate(self, new_coord):
+        self.coord[self.piece] = new_coord
+        
 
     def fill(self):
         for x,y in self.coord[self.piece]:

@@ -1,5 +1,5 @@
 INFO:root:Generate new fall piece - R
-INFO:root:Generate next piece - L
+INFO:root:Generate next piece - J
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
@@ -7,111 +7,69 @@ INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 4
+INFO:root:Creating a list with free positions of white cells
+INFO:root:Dropping piece
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
 INFO:root:Down key pressed
 INFO:root:Down movement is possible
 INFO:root:Score updated to 6
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 7
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
 INFO:root:Down key pressed
 INFO:root:Down movement is possible
-INFO:root:Score updated to 9
+INFO:root:Score updated to 8
+INFO:root:Creating a list with free positions of white cells
+INFO:root:Dropping piece
 INFO:root:Down key pressed
 INFO:root:Down movement is possible
 INFO:root:Score updated to 10
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 12
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 14
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 15
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 17
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 18
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Changing piece
-INFO:root:Generate next piece - T
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
+INFO:root:Left key pressed
+INFO:root:Left movement is possible
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
+INFO:root:Left key pressed
+INFO:root:Left movement is possible
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 23
+INFO:root:Left key pressed
+INFO:root:Left movement is possible
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 25
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 27
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 29
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 30
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 32
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Down key pressed
-ERROR:root:Invalid space
-INFO:root:Down key pressed
-ERROR:root:Invalid space
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Changing piece
-INFO:root:Generate next piece - 1
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 34
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 35
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 38
 INFO:root:Right key pressed
 INFO:root:Right movement is possible
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
+INFO:root:Right key pressed
+INFO:root:Right movement is possible
+INFO:root:Creating a list with free positions of white cells
+INFO:root:Dropping piece
+INFO:root:Right key pressed
+INFO:root:Right movement is possible
+INFO:root:Creating a list with free positions of white cells
+INFO:root:Dropping piece
+INFO:root:Changing piece
+INFO:root:Generate next piece - L
+INFO:root:Right key pressed
+INFO:root:Right movement is possible
+INFO:root:Creating a list with free positions of white cells
+INFO:root:Dropping piece
+INFO:root:Right key pressed
+INFO:root:Right movement is possible
+INFO:root:Creating a list with free positions of white cells
+INFO:root:Dropping piece
+INFO:root:Right key pressed
+INFO:root:Right movement is possible
+INFO:root:Creating a list with free positions of white cells
+INFO:root:Dropping piece
+INFO:root:Left key pressed
+INFO:root:Left movement is possible
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
 INFO:root:Left key pressed
@@ -122,49 +80,6 @@ INFO:root:Up key pressed
 INFO:root:Rotation to right is possible
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
-INFO:root:Right key pressed
-INFO:root:Right movement is possible
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 44
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Changing piece
-INFO:root:Generate next piece - S
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 46
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 48
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 50
-INFO:root:Down key pressed
-INFO:root:Down movement is possible
-INFO:root:Score updated to 51
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Changing piece
-INFO:root:Generate next piece - R
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Up key pressed
-INFO:root:Rotation to right is possible
-INFO:root:Creating a list with free positions of white cells
-INFO:root:Dropping piece
-INFO:root:Left key pressed
-INFO:root:Left movement is possible
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
 INFO:root:Creating a list with free positions of white cells
@@ -173,12 +88,14 @@ INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
-INFO:root:Changing piece
-INFO:root:Generate next piece - R
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
-INFO:root:Left key pressed
-INFO:root:Left movement is possible
+INFO:root:Z key pressed
+INFO:root:Rotation to left is possible
+INFO:root:Creating a list with free positions of white cells
+INFO:root:Dropping piece
+INFO:root:Creating a list with free positions of white cells
+INFO:root:Dropping piece
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
 INFO:root:Creating a list with free positions of white cells
@@ -191,15 +108,16 @@ INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
-INFO:root:Changing piece
-INFO:root:Generate next piece - S
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
-INFO:root:Changing piece
-INFO:root:Generate next piece - S
 INFO:root:Creating a list with free positions of white cells
 INFO:root:Dropping piece
-INFO:root:Changing piece
-ERROR:root:Game Over!
-INFO:root:Generate next piece - T
+INFO:root:Creating a list with free positions of white cells
+INFO:root:Dropping piece
+INFO:root:Creating a list with free positions of white cells
+INFO:root:Dropping piece
+INFO:root:Creating a list with free positions of white cells
+INFO:root:Dropping piece
+INFO:root:Creating a list with free positions of white cells
+INFO:root:Dropping piece
 INFO:root:Exit Application

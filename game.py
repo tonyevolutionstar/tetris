@@ -1,3 +1,5 @@
+from commands import Command, InputHandler
+from observer import Subject
 import pygame 
 import logging
 import os
@@ -125,6 +127,7 @@ def validate_rotate_l(free_pos, piece, falling_piece):
                     return False, new_l
     else:
         return False, new_l
+
     return True, new_l
 
 
@@ -179,6 +182,7 @@ def clear_rows(x_left, x_right, grid, new_g):
         for x, y in sorted(new_g,reverse=True):
             if y-1 > 1:
                 new_g[(x, y)] = grid[(x,y-1)]
+               
         
         return lines, new_g
     return 0, grid
@@ -202,6 +206,10 @@ def set_free_pos(grid):
 
 
 def main():
+    # observer pattern
+    obs = Subject()
+    obs.add_observer(obs)
+
     score = 0
     score_lines = 0
     lost = ""
@@ -221,7 +229,7 @@ def main():
         
     #pieces
     fall_piece = generate_falling_piece()
-    falling_piece_sprite.add(fall_piece)
+    falling_piece_sprite.add(fall_piece) 
     next_piece = generate_next_piece()
     next_piece_sprite.add(next_piece)
     
@@ -248,15 +256,19 @@ def main():
            
             orientation_piece = (0, 1)
             logging.info("Dropping piece")
+          
             lines, screen_play.grid = clear_rows(x_left, x_right, screen_play.grid, create_grid)
             score_lines += lines
             if validate_space(free_pos, fall_piece.coord[fall_piece.piece], orientation_piece):
                 fall_piece.set_pos(orientation_piece) 
+                obs.notify(fall_piece, "Moved one square down")
+                obs.notify("score", "Updated to " + str(score))
                 score += 1
                 score, action = handle_score(lines, score)
                 if action != "":
                     logging.info("Action " + action)
                     logging.info("Score updated to " + str(score))
+                    obs.notify("score", "Updated to " + str(score))
             else:
                 change_piece = True
                 logging.info("Changing piece")
@@ -272,38 +284,47 @@ def main():
                 logging.info("Exit Application")
                 run = 0
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
+                input_h = InputHandler()
+                
+                if event.key == pygame.K_DOWN:
+                    logging.info("Down key pressed")
+                    orientation_piece = (0, 1)
+                    if validate_space(free_pos,fall_piece.coord[fall_piece.piece], orientation_piece):
+                        input_h.handleInput(event.key, fall_piece, orientation_piece)
+                        obs.notify(fall_piece, "Moved one square down faster")
+                        logging.info("Down movement is possible") 
+                        score += 1
+                        logging.info("Score updated to " + str(score))
+                        obs.notify("score", "Updated to " + str(score))
+                    else:
+                        logging.error("Invalid space")
+                   
+                elif event.key == pygame.K_LEFT:
                     logging.info("Left key pressed")
                     orientation_piece = (-1, 0)
                     if validate_space(free_pos,fall_piece.coord[fall_piece.piece], orientation_piece):
-                        fall_piece.set_pos(orientation_piece)  
+                        input_h.handleInput(event.key, fall_piece, orientation_piece)
                         logging.info("Left movement is possible")
+                        obs.notify(fall_piece, "Moved one square left")
                     else:
                         logging.error("Invalid space")
                 elif event.key == pygame.K_RIGHT:
                     logging.info("Right key pressed")
                     orientation_piece = (1, 0)
                     if validate_space(free_pos,fall_piece.coord[fall_piece.piece], orientation_piece):
-                        fall_piece.set_pos(orientation_piece) 
+                        input_h.handleInput(event.key, fall_piece, orientation_piece)
                         logging.info("Right movement is possible")
+                        obs.notify(fall_piece, "Moved one square right")
                     else:
                         logging.error("Invalid space")
-                elif event.key == pygame.K_DOWN:
-                    logging.info("Down key pressed")
-                    orientation_piece = (0, 1)
-                    if validate_space(free_pos,fall_piece.coord[fall_piece.piece], orientation_piece):
-                        fall_piece.set_pos(orientation_piece) 
-                        logging.info("Down movement is possible") 
-                        score += 1
-                        logging.info("Score updated to " + str(score))
-                    else:
-                        logging.error("Invalid space")
+                        
                 elif event.key == pygame.K_z:# rotate left
                     logging.info("Z key pressed")
                     val_rot, pos = validate_rotate_l(free_pos, fall_piece.piece, fall_piece.coord[fall_piece.piece])
                     if val_rot:
                         logging.info("Rotation to left is possible")
-                        fall_piece.coord[fall_piece.piece] = pos
+                        input_h.handleInput(event.key, fall_piece, pos)
+                        obs.notify(fall_piece, "Rotated to left")
                     else:
                         logging.error("Invalid space")
                 elif event.key == pygame.K_UP: # rotate right
@@ -311,7 +332,8 @@ def main():
                     logging.info("Up key pressed")
                     if val_rot:
                         logging.info("Rotation to right is possible")
-                        fall_piece.coord[fall_piece.piece] = pos
+                        obs.notify(fall_piece, "Rotated to right")
+                        input_h.handleInput(event.key, fall_piece, pos)
                     else:
                         logging.error("Invalid space")
                 else:
@@ -319,8 +341,11 @@ def main():
                     orientation_piece = (0,0)
                     logging.error("Invalid Key pressed. Valid ones up, left, down, up, z")
 
+
         if change_piece:
             screen_play.set_grid(fall_piece.coord[fall_piece.piece], fall_piece.color_piece[fall_piece.piece])
+            obs.notify(fall_piece, "Changed")
+            obs.notify(screen_play, "updated grid")
             fall_piece.piece = next_piece.piece
             fall_piece.set_coord()
             next_piece = generate_next_piece()
@@ -339,6 +364,7 @@ def main():
         pygame.display.update()
         if run == 0:
             logging.info("Exit Application")
+            obs.notify("tetris", " is over")
             pygame.time.delay(1000)
 
 
