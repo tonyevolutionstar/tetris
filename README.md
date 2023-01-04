@@ -60,8 +60,6 @@ The program is divided into files. <br>
 <h1>Patterns</h1>
 - Command: Used to handle keyboard inputs. <br>
 - Observer: Used to record events in game - done with log file. <br>
-- Game Loop: Logic of the game - process input -> update game -> render - time to process. <br>
-- Update: Updating frames using sprite - need to update the state of the pieces on tetris.  <br>
 
 <h1>How to run</h1>
 On a new terminal in the folder run python3 game.py <br>
